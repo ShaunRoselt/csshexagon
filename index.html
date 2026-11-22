@@ -62,8 +62,15 @@
             border: 1px solid #ced4da;
             border-radius: .25rem;
         }
+        #layHexagon > .col:first-child {
+            padding-block-end: max(var(--hexagon-margin-top), var(--hexagon-hover-margin-top));
+        }
     </style>
     <style id="HexagonCodeCSS">
+.hexagon, .hexagon::before, .hexagon::after {
+    box-sizing: border-box;
+}
+
 .hexagon {
     cursor: var(--hexagon-cursor);
     position: relative;
@@ -107,16 +114,26 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute;
+    align-self: start;
     font-size: var(--hexagon-span-text-size);
     color: var(--hexagon-span-color);
-    top: var(--hexagon-span-top);
-    left: 0;
+    margin-top: var(--hexagon-span-top);
     width: var(--hexagon-span-width);
     height: var(--hexagon-span-height);
     z-index: 2;
     background: inherit;
     transition: var(--hexagon-hover-span-transition);
+}
+
+.hexagon > span::before {
+    content: "";
+    position: absolute;
+    inset: calc(-50% + 2 * var(--hexagon-span-top)) 0;
+    z-index: -1;
+    background: var(--hexagon-background-image) center / cover no-repeat;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    pointer-events: none;
+    transition: inset var(--hexagon-hover-transition);
 }
     </style>
     <style id="HexagonHoverCodeCSS">
@@ -153,9 +170,14 @@
 .hexagon:hover span {
     font-size: var(--hexagon-hover-span-text-size);
     color: var(--hexagon-hover-span-color);
-    top: var(--hexagon-hover-span-top);
+    margin-top: var(--hexagon-hover-span-top);
     width: var(--hexagon-hover-span-width);
     height: var(--hexagon-hover-span-height);
+}
+
+.hexagon:hover > span::before {
+    inset: calc(-50% + 2 * var(--hexagon-hover-span-top)) 0;
+    background-image: var(--hexagon-hover-background-image);
 }
     </style>
 </head>
@@ -203,7 +225,7 @@
             </ul>
             <div class="tab-content mt-3" id="myTabContent">
                 <div class="tab-pane active" id="general" role="tabpanel" aria-labelledby="general-tab">
-                    <div class="row">
+                    <div class="row row-cols-1 sm:row-cols-2 md:row-cols-3 xl:row-cols-5 gy-3">
                         <div class="col">
                             <div class="form-floating">
                                 <label for="hexagonSize">Size (px)</label>
@@ -256,19 +278,13 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="inputContainer">
-                                <div class="form-field">
-                                    <input class="radio" type="radio" name="hexagonBackgroundChecks" id="hexagonBackgroundCheck1" value="option1" checked>
-                                    <label for="hexagonBackgroundCheck1">Solid Color</label>
-                                </div>
-                                <div class="form-field">
-                                    <input class="radio" type="radio" name="hexagonBackgroundChecks" id="hexagonBackgroundCheck2" value="option2" disabled>
-                                    <label for="hexagonBackgroundCheck2">Image</label>
-                                </div>
-                            </div>
                             <div class="form-floating">
                                 <label for="hexagonColor">Solid Color</label>
                                 <input type="color" class="form-control" id="hexagonColor" placeholder="Solid Color" oninput="HexagonSizeChange();" value="#2b2f38">
+                            </div>
+                            <div class="form-field inputContainer">
+                                <label for="hexagonImageURL">Image URL</label>
+                                <input class="form-control" id="hexagonImageURL" type="url" placeholder="https://…" oninput="HexagonSizeChange();">
                             </div>
                         </div>
                         <div class="col">
@@ -312,7 +328,7 @@
                     </div>
                 </div>
                 <div class="tab-pane" id="hover" role="tabpanel" aria-labelledby="hover-tab">
-                    <div class="row">
+                    <div class="row row-cols-1 sm:row-cols-2 md:row-cols-3 xl:row-cols-5 gy-3">
                         <div class="col">
                             <div class="inputContainer">
                                 <div class="form-field">
@@ -330,19 +346,13 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="inputContainer">
-                                <div class="form-field">
-                                    <input class="radio" type="radio" name="hexagonHoverBackgroundChecks" id="hexagonHoverBackgroundCheck1" value="option1" checked>
-                                    <label for="hexagonHoverBackgroundCheck1">Solid Color</label>
-                                </div>
-                                <div class="form-field">
-                                    <input class="radio" type="radio" name="hexagonHoverBackgroundChecks" id="hexagonHoverBackgroundCheck2" value="option2" disabled>
-                                    <label for="hexagonHoverBackgroundCheck2">Image</label>
-                                </div>
-                            </div>
                             <div class="form-floating">
                                 <label for="hexagonHoverColor">Solid Color</label>
                                 <input type="color" class="form-control" id="hexagonHoverColor" placeholder="Solid Color" oninput="HexagonSizeChange();" value="#2b2f38">
+                            </div>
+                            <div class="form-field inputContainer">
+                                <label for="hexagonHoverImageURL">Image URL</label>
+                                <input class="form-control" id="hexagonHoverImageURL" type="url" placeholder="https://…" oninput="HexagonSizeChange();">
                             </div>
                         </div>
                         <div class="col">
@@ -388,7 +398,7 @@
             </div>
         </section>
         <hr>
-        <section class="row mb-3" id="layHexagon">
+        <section class="row row-cols-1 md:row-cols-2 gy-3 mb-3" id="layHexagon">
             <div class="col">
                 <div class="hexagon">
                     <span id="layHexagonText"></span>
@@ -404,6 +414,12 @@
     </section>
 
     <script>
+        function getBackgroundImage(inputId) {
+            const url = URL.parse(document.getElementById(inputId).value.trim());
+            if (!url || !["http:", "https:"].includes(url.protocol)) return "none";
+            return `url(${JSON.stringify(url.href)})`;
+        }
+
         function HexagonSizeChange(){
             function ColorHexToRGB(Hex){
                 if (Hex[0] == "#") Hex = Hex.slice(1);
@@ -420,6 +436,11 @@
             document.querySelectorAll("#hover .form-control, #hover .form-range-input").forEach((element) => {
                 element.disabled = !HexagonHover;
             });
+            const backgroundImage = getBackgroundImage("hexagonImageURL");
+            const hoverBackgroundImage = HexagonHover ? getBackgroundImage("hexagonHoverImageURL") : backgroundImage;
+
+            document.documentElement.style.setProperty("--hexagon-background-image", backgroundImage);
+            document.documentElement.style.setProperty("--hexagon-hover-background-image", hoverBackgroundImage);
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // General
@@ -492,7 +513,7 @@
             const HexagonHoverShadowColorArrayRGB = ColorHexToRGB(HexagonHoverShadowColor);
             const HexagonHoverShadowColorAlpha = document.getElementById("hexagonHoverShadowColorAlpha").value;
             let HexagonHoverSpanTextSize = document.getElementById("hexagonHoverTextSize").value;
-            if (HexagonHoverSpanTextSize == "") hexagonHoverSpanTextSize = 0;
+            if (HexagonHoverSpanTextSize == "") HexagonHoverSpanTextSize = 0;
             const HexagonHoverSpanColor = document.getElementById("hexagonHoverTextColor").value;
             const HexagonHoverShadowSpanTop = HexagonHoverBorderSize * Math.tan(30 * Math.PI/180);
             const HexagonHoverShadowSpanWidth = HexagonHoverWidth - (HexagonHoverBorderSize * 2); 
@@ -544,6 +565,11 @@
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             
+            let hexagonRules = document.getElementById("HexagonCodeCSS").textContent.trim();
+            if (HexagonHover) {
+                hexagonRules += "\n\n" + document.getElementById("HexagonHoverCodeCSS").textContent.trim();
+            }
+
             const layHexagonCodeCSS = document.getElementById("layHexagonCodeCSS");
             if (HexagonVariablesCSS){
                 layHexagonCodeCSS.textContent =
@@ -566,10 +592,13 @@
     --hexagon-span-top: ${HexagonShadowSpanTop}px;
     --hexagon-span-width: ${HexagonShadowSpanWidth}px;
     --hexagon-span-height: ${HexagonShadowSpanHeight}px;
+    --hexagon-hover-span-transition: ${HexagonHover ? HexagonHoverSpanTransition : 0}s;
+    --hexagon-hover-transition: ${HexagonHover ? HexagonHoverTransition : 0}s;
+    --hexagon-background-image: ${backgroundImage};
 `;
                 if (HexagonHover) {
                     layHexagonCodeCSS.textContent +=
-`    
+`    --hexagon-hover-background-image: ${hoverBackgroundImage};
     --hexagon-hover-width: ${HexagonHoverWidth}px;
     --hexagon-hover-height: ${HexagonHoverHeight}px;
     --hexagon-hover-margin-top: ${HexagonHoverMarginTop}px;
@@ -587,16 +616,11 @@
     --hexagon-hover-span-top: ${HexagonHoverShadowSpanTop}px;
     --hexagon-hover-span-width: ${HexagonHoverShadowSpanWidth}px;
     --hexagon-hover-span-height: ${HexagonHoverShadowSpanHeight}px;
-    --hexagon-hover-span-height: ${HexagonHoverShadowSpanHeight}px;
-    --hexagon-hover-span-transition: ${HexagonHoverSpanTransition}s;
-    --hexagon-hover-transition: ${HexagonHoverTransition}s;
 `;
                 }
-                layHexagonCodeCSS.textContent += `}
-` + document.getElementById("HexagonCodeCSS").innerHTML + document.getElementById("HexagonHoverCodeCSS").innerHTML;
+                layHexagonCodeCSS.textContent += `}\n\n${hexagonRules}`;
             } else {
-                let HexagonCodeCSS = document.getElementById("HexagonCodeCSS").innerHTML + document.getElementById("HexagonHoverCodeCSS").innerHTML;
-                if ((HexagonCodeCSS.charAt(0) != ".") || (HexagonCodeCSS.charAt(0) != ":")) HexagonCodeCSS = HexagonCodeCSS.slice(1);
+                let HexagonCodeCSS = hexagonRules;
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-cursor)",`${HexagonCursor}`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-width)",`${HexagonWidth}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-height)",`${HexagonHeight}px`);
@@ -633,9 +657,10 @@
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-top)",`${HexagonHoverShadowSpanTop}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-width)",`${HexagonHoverShadowSpanWidth}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-height)",`${HexagonHoverShadowSpanHeight}px`);
-                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-transition)",`${HexagonHoverSpanTransition}s`);
-                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-transition)",`${HexagonHoverTransition}s`);
-                layHexagonCodeCSS.textContent = HexagonCodeCSS;
+                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-transition)", `${HexagonHover ? HexagonHoverSpanTransition : 0}s`);
+                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-transition)", `${HexagonHover ? HexagonHoverTransition : 0}s`);
+                layHexagonCodeCSS.textContent = HexagonCodeCSS.replace(/var\(--hexagon-(hover-)?background-image\)/g,
+                    (_, hover) => hover ? hoverBackgroundImage : backgroundImage);
             }
             const escapedText = HexagonSpanText.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
             const layHexagonCodeHTML = document.getElementById("layHexagonCodeHTML");
