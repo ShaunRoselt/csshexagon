@@ -12,6 +12,7 @@ const types = {
 const status = document.getElementById("downloadStatus");
 const toggle = document.getElementById("downloadToggle");
 const menu = document.getElementById("downloadMenu");
+const { pointsFor, svgGradient } = window;
 let preparing = false;
 let encodeWebP;
 
@@ -44,16 +45,10 @@ function makeTextDownload(format) {
     return new Blob([page], { type: types.html });
 }
 
-function pointsFor(outline, width, height, insetX = 0, insetY = 0) {
-    return outline.slice("polygon(".length, -1).split(",").map(point => {
-        const [x, y] = point.trim().split(/\s+/).map(parseFloat);
-        return `${insetX + x / 100 * (width - 2 * insetX)},${insetY + y / 100 * (height - 2 * insetY)}`;
-    }).join(" ");
-}
-
 function readDesign(hover = false) {
     const style = document.documentElement.style;
     const prefix = hover ? "--hexagon-hover-" : "--hexagon-";
+    const inputPrefix = hover ? "hexagonHover" : "hexagon";
     const setting = name => style.getPropertyValue(prefix + name);
     const number = name => parseFloat(setting(name));
     const outline = setting("outline");
@@ -75,12 +70,16 @@ function readDesign(hover = false) {
         borderOpacity: Number(border > 0),
         borderColor: setting("border-color"),
         color: setting("color"),
-        imageURL: window.getImageURL(hover ? "hexagonHoverImageURL" : "hexagonImageURL"),
+        imageURL: window.getImageURL(inputPrefix + "ImageURL"),
+        gradient: window.getGradient(inputPrefix),
+        borderGradient: window.getGradient(inputPrefix + "Border"),
+        textGradient: window.getGradient(inputPrefix + "Text"),
+        shadowGradient: window.getGradient(inputPrefix + "Shadow"),
         shadowColor: `rgb(${shadow.slice(0, 3).join(",")})`,
         shadowOpacity: shadow[3],
         shadowBlur: number("shadow-blur") / 2,
         text: text.textContent,
-        textColor: setting("span-color"),
+        textColor: document.getElementById(inputPrefix + "TextColor").value,
         textSize: number("span-text-size"),
         textWidth: number("span-width"),
         fontFamily: textStyle.fontFamily,
@@ -132,8 +131,17 @@ function textMarkup(design) {
     const x = design.width / 2;
     const lineHeight = design.textSize * 1.5;
     const y = design.height / 2 - (lines.length - 1) * lineHeight / 2;
-    return `<text text-anchor="middle" dominant-baseline="central" font-family="${escapeXML(design.fontFamily)}"
-        font-size="${design.textSize}" fill="${design.textColor}">
+    let fill = design.textColor;
+    let definition = "";
+    if (design.textGradient) {
+        const width = Math.max(...lines.map(line => context.measureText(line).width));
+        const height = lines.length * lineHeight;
+        definition = svgGradient(design.textGradient, "hexagon-text-gradient", x - width / 2, y - lineHeight / 2, width, height);
+        fill = "url(#hexagon-text-gradient)";
+    }
+    return `${definition ? `<defs>${definition}</defs>` : ""}
+    <text text-anchor="middle" dominant-baseline="central" font-family="${escapeXML(design.fontFamily)}"
+        font-size="${design.textSize}" fill="${fill}">
         ${lines.map((value, index) => `<tspan x="${x}" y="${y + index * lineHeight}">${escapeXML(value)}</tspan>`).join("")}
     </text>`;
 }
@@ -156,19 +164,23 @@ function svgFrame(design, image, bounds, layer = "Composite") {
     const left = (width - bounds.width) / 2;
     const top = -bounds.pad;
     const hasShadow = shadowBlur > 0 && shadowOpacity > 0 && ["Composite", "Shadow"].includes(layer);
+    const gradientShadow = hasShadow && design.shadowGradient;
+    const borderPaint = design.borderGradient ? "url(#hexagon-border-gradient)" : design.borderColor;
     const parts = {
         Border: design.borderOpacity
-            ? `<polygon points="${outer}" fill="${design.borderColor}" opacity="${design.borderOpacity}"/>`
+            ? `<polygon points="${outer}" fill="${borderPaint}" opacity="${design.borderOpacity}"/>`
             : "",
-        Fill: `<polygon points="${inner}" fill="${design.color}"/>`,
+        Fill: `<polygon points="${inner}" fill="${design.gradient ? "url(#hexagon-gradient)" : design.color}"/>`,
         Image: image ? `<image href="${escapeXML(image)}" x="${insetX}" y="${insetY}" width="${Math.max(0, width - 2 * insetX)}"
             height="${Math.max(0, height - 2 * insetY)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#hexagon-fill)"/>` : "",
         Text: ["Composite", "Shadow", "Text"].includes(layer) ? textMarkup(design) : "",
     };
-    const content = layer === "Border"
-        ? `<path d="${polygonPath(outer)} ${polygonPath(inner)}" fill-rule="evenodd" fill="${design.borderColor}"/>`
+    const content = layer === "Shadow" && gradientShadow ? "" : layer === "Border"
+        ? `<path d="${polygonPath(outer)} ${polygonPath(inner)}" fill-rule="evenodd" fill="${borderPaint}"/>`
         : ["Composite", "Shadow"].includes(layer) ? Object.values(parts).join("\n") : parts[layer];
-    const shadow = layer === "Shadow"
+    const shadow = gradientShadow
+        ? `<feGaussianBlur stdDeviation="${shadowBlur}"/>`
+        : layer === "Shadow"
         ? `<feGaussianBlur in="SourceAlpha" stdDeviation="${shadowBlur}" result="blur"/>
             <feFlood flood-color="${shadowColor}" flood-opacity="${shadowOpacity}"/>
             <feComposite in2="blur" operator="in"/>`
@@ -176,11 +188,15 @@ function svgFrame(design, image, bounds, layer = "Composite") {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${bounds.width}" height="${bounds.height}"
         viewBox="${left} ${top} ${bounds.width} ${bounds.height}">
     <defs>
+        ${design.gradient ? svgGradient(design.gradient, "hexagon-gradient", insetX, insetY, width - 2 * insetX, height - 2 * insetY) : ""}
+        ${design.borderGradient ? svgGradient(design.borderGradient, "hexagon-border-gradient", 0, 0, width, height) : ""}
+        ${gradientShadow ? svgGradient(gradientShadow, "hexagon-shadow-gradient", 0, 0, width, height) : ""}
         ${image ? `<clipPath id="hexagon-fill"><polygon points="${inner}"/></clipPath>` : ""}
         ${hasShadow ? `<filter id="hexagon-shadow" filterUnits="userSpaceOnUse" x="${left}" y="${top}"
             width="${bounds.width}" height="${bounds.height}" color-interpolation-filters="sRGB">${shadow}</filter>` : ""}
     </defs>
-    <g${hasShadow ? ' filter="url(#hexagon-shadow)"' : ""}>
+    ${gradientShadow ? `<polygon points="${outer}" fill="url(#hexagon-shadow-gradient)" filter="url(#hexagon-shadow)" opacity="${shadowOpacity}"/>` : ""}
+    <g${hasShadow && !gradientShadow ? ' filter="url(#hexagon-shadow)"' : ""}>
         ${content}
     </g>
 </svg>`;
@@ -403,10 +419,16 @@ async function makePDF() {
         if (hasShadow(design)) await drawLayer("Shadow");
         const position = { x: (bounds.width - design.width) / 2 * scale, y: height - bounds.pad * scale, scale };
         const { outline, width: shapeWidth, height: shapeHeight, insetX, insetY } = design;
-        if (design.borderOpacity) {
+        if (design.borderOpacity && design.borderGradient) {
+            await drawLayer("Border");
+        } else if (design.borderOpacity) {
             page.drawSvgPath(polygonPath(pointsFor(outline, shapeWidth, shapeHeight)), { ...position, color: paint(design.borderColor) });
         }
-        page.drawSvgPath(polygonPath(pointsFor(outline, shapeWidth, shapeHeight, insetX, insetY)), { ...position, color: paint(design.color) });
+        if (design.gradient) {
+            await drawLayer("Fill");
+        } else {
+            page.drawSvgPath(polygonPath(pointsFor(outline, shapeWidth, shapeHeight, insetX, insetY)), { ...position, color: paint(design.color) });
+        }
         if (image) await drawLayer("Image");
         if (design.text.trim() && design.textSize) await drawLayer("Text");
     }
