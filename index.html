@@ -54,6 +54,33 @@
             border: 1px solid #ced4da;
             border-radius: .25rem;
         }
+        .gradient-controls {
+            min-inline-size: 0;
+        }
+        .gradient-controls .gradient-color,
+        .gradient-controls .form-range {
+            margin-block-start: .5rem;
+        }
+        .gradient-color > label {
+            display: block;
+            font-size: .8125rem;
+        }
+        .gradient-color > .form-control {
+            min-height: 1.5rem;
+            padding: 0;
+            border: 0;
+            box-shadow: none;
+            background-color: transparent;
+        }
+        .gradient-color > .form-control:focus-visible {
+            outline: 2px solid var(--bs-fg-2);
+            outline-offset: 1px;
+        }
+        .gradient-controls:has(.gradient-toggle:disabled) {
+            background-color: var(--bs-bg-2);
+            border-color: var(--bs-border-color);
+            color: var(--bs-fg-3);
+        }
         .form-range.inputContainer:has(> .form-range-input:disabled) {
             background-color: var(--bs-bg-2);
             border-color: var(--bs-border-color);
@@ -415,27 +442,28 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="inputContainer">
+                            <fieldset class="inputContainer gradient-controls">
+                                <legend class="visually-hidden">Fill colors</legend>
                                 <div class="form-field">
                                     <input class="check gradient-toggle" type="checkbox" id="hexagonGradient" aria-controls="hexagonGradientOptions" onchange="HexagonSizeChange();">
                                     <label for="hexagonGradient">Gradient Fill</label>
                                 </div>
-                            </div>
-                            <div class="form-floating">
-                                <label for="hexagonColor" id="hexagonColorLabel">Solid Color</label>
-                                <input type="color" class="form-control" id="hexagonColor" placeholder="Solid Color" oninput="HexagonSizeChange();" value="#2b2f38">
-                            </div>
-                            <div id="hexagonGradientOptions" hidden>
-                                <div class="form-floating">
-                                    <label for="hexagonGradientEndColor">End Color</label>
-                                    <input type="color" class="form-control" id="hexagonGradientEndColor" placeholder="End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                <div class="gradient-color">
+                                    <label for="hexagonColor" id="hexagonColorLabel">Solid Color</label>
+                                    <input type="color" class="form-control" id="hexagonColor" placeholder="Solid Color" oninput="HexagonSizeChange();" value="#2b2f38">
                                 </div>
-                                <div class="form-range inputContainer">
-                                    <label for="hexagonGradientAngle">Angle (°)</label>
-                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Angle (°)" value="90">
-                                    <input class="form-range-input" type="range" id="hexagonGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                <div id="hexagonGradientOptions" hidden>
+                                    <div class="gradient-color">
+                                        <label for="hexagonGradientEndColor">End Color</label>
+                                        <input type="color" class="form-control" id="hexagonGradientEndColor" placeholder="End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonGradientAngle">Angle (°)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Angle (°)" value="90">
+                                        <input class="form-range-input" type="range" id="hexagonGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                             <div class="form-floating">
                                 <label for="hexagonImageURL">Image URL</label>
                                 <input class="form-control" id="hexagonImageURL" type="url" placeholder="https://…" oninput="HexagonSizeChange();">
@@ -447,27 +475,28 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Border Size (px)" value="10">
                                 <input class="form-range-input" type="range" id="hexagonBorderSize" min="0" max="150" step="1" value="10" oninput="HexagonSizeChange();">
                             </div>
-                            <div class="inputContainer">
+                            <fieldset class="inputContainer gradient-controls">
+                                <legend class="visually-hidden">Border colors</legend>
                                 <div class="form-field">
                                     <input class="check gradient-toggle" type="checkbox" id="hexagonBorderGradient" aria-controls="hexagonBorderGradientOptions" onchange="HexagonSizeChange();">
                                     <label for="hexagonBorderGradient">Gradient Border</label>
                                 </div>
-                            </div>
-                            <div class="form-floating">
-                                <label for="hexagonBorderColor" id="hexagonBorderColorLabel">Border Color</label>
-                                <input type="color" class="form-control" id="hexagonBorderColor" placeholder="Border Color" oninput="HexagonSizeChange();" value="#f47721">
-                            </div>
-                            <div id="hexagonBorderGradientOptions" hidden>
-                                <div class="form-floating">
-                                    <label for="hexagonBorderGradientEndColor">Border End Color</label>
-                                    <input type="color" class="form-control" id="hexagonBorderGradientEndColor" placeholder="Border End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                <div class="gradient-color">
+                                    <label for="hexagonBorderColor" id="hexagonBorderColorLabel">Border Color</label>
+                                    <input type="color" class="form-control" id="hexagonBorderColor" placeholder="Border Color" oninput="HexagonSizeChange();" value="#f47721">
                                 </div>
-                                <div class="form-range inputContainer">
-                                    <label for="hexagonBorderGradientAngle">Border Angle (°)</label>
-                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Border Angle (°)" value="90">
-                                    <input class="form-range-input" type="range" id="hexagonBorderGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                <div id="hexagonBorderGradientOptions" hidden>
+                                    <div class="gradient-color">
+                                        <label for="hexagonBorderGradientEndColor">Border End Color</label>
+                                        <input type="color" class="form-control" id="hexagonBorderGradientEndColor" placeholder="Border End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonBorderGradientAngle">Border Angle (°)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Border Angle (°)" value="90">
+                                        <input class="form-range-input" type="range" id="hexagonBorderGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                         </div>
                         <div class="col">
                             <div class="form-range inputContainer">
@@ -475,27 +504,28 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Shadow Blur (px)" value="50">
                                 <input class="form-range-input" type="range" id="hexagonShadowBlur" min="0" max="200" step="1" value="50" oninput="HexagonSizeChange();">
                             </div>
-                            <div class="inputContainer">
+                            <fieldset class="inputContainer gradient-controls">
+                                <legend class="visually-hidden">Shadow colors</legend>
                                 <div class="form-field">
                                     <input class="check gradient-toggle" type="checkbox" id="hexagonShadowGradient" aria-controls="hexagonShadowGradientOptions" onchange="HexagonSizeChange();">
                                     <label for="hexagonShadowGradient">Gradient Shadow</label>
                                 </div>
-                            </div>
-                            <div class="form-floating">
-                                <label for="hexagonShadowColor" id="hexagonShadowColorLabel">Shadow Color</label>
-                                <input type="color" class="form-control" id="hexagonShadowColor" placeholder="Shadow Color" oninput="HexagonSizeChange();" value="#00FFFF">
-                            </div>
-                            <div id="hexagonShadowGradientOptions" hidden>
-                                <div class="form-floating">
-                                    <label for="hexagonShadowGradientEndColor">Shadow End Color</label>
-                                    <input type="color" class="form-control" id="hexagonShadowGradientEndColor" placeholder="Shadow End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                <div class="gradient-color">
+                                    <label for="hexagonShadowColor" id="hexagonShadowColorLabel">Shadow Color</label>
+                                    <input type="color" class="form-control" id="hexagonShadowColor" placeholder="Shadow Color" oninput="HexagonSizeChange();" value="#00FFFF">
                                 </div>
-                                <div class="form-range inputContainer">
-                                    <label for="hexagonShadowGradientAngle">Shadow Angle (°)</label>
-                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Shadow Angle (°)" value="90">
-                                    <input class="form-range-input" type="range" id="hexagonShadowGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                <div id="hexagonShadowGradientOptions" hidden>
+                                    <div class="gradient-color">
+                                        <label for="hexagonShadowGradientEndColor">Shadow End Color</label>
+                                        <input type="color" class="form-control" id="hexagonShadowGradientEndColor" placeholder="Shadow End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonShadowGradientAngle">Shadow Angle (°)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Shadow Angle (°)" value="90">
+                                        <input class="form-range-input" type="range" id="hexagonShadowGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                             <div class="form-range inputContainer">
                                 <label for="hexagonShadowColorAlpha">Shadow Alpha</label>
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Shadow Alpha" value="1">
@@ -507,27 +537,28 @@
                                 <label for="hexagonText">Text</label>
                                 <input type="text" class="form-control" id="hexagonText" placeholder="Text" oninput="HexagonSizeChange();" value="I am text!">
                             </div>
-                            <div class="inputContainer">
+                            <fieldset class="inputContainer gradient-controls">
+                                <legend class="visually-hidden">Text colors</legend>
                                 <div class="form-field">
                                     <input class="check gradient-toggle" type="checkbox" id="hexagonTextGradient" aria-controls="hexagonTextGradientOptions" onchange="HexagonSizeChange();">
                                     <label for="hexagonTextGradient">Gradient Text</label>
                                 </div>
-                            </div>
-                            <div class="form-floating">
-                                <label for="hexagonTextColor" id="hexagonTextColorLabel">Text Color</label>
-                                <input type="color" class="form-control" id="hexagonTextColor" placeholder="Text Color" oninput="HexagonSizeChange();" value="#f47721">
-                            </div>
-                            <div id="hexagonTextGradientOptions" hidden>
-                                <div class="form-floating">
-                                    <label for="hexagonTextGradientEndColor">Text End Color</label>
-                                    <input type="color" class="form-control" id="hexagonTextGradientEndColor" placeholder="Text End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                <div class="gradient-color">
+                                    <label for="hexagonTextColor" id="hexagonTextColorLabel">Text Color</label>
+                                    <input type="color" class="form-control" id="hexagonTextColor" placeholder="Text Color" oninput="HexagonSizeChange();" value="#f47721">
                                 </div>
-                                <div class="form-range inputContainer">
-                                    <label for="hexagonTextGradientAngle">Text Angle (°)</label>
-                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Text Angle (°)" value="90">
-                                    <input class="form-range-input" type="range" id="hexagonTextGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                <div id="hexagonTextGradientOptions" hidden>
+                                    <div class="gradient-color">
+                                        <label for="hexagonTextGradientEndColor">Text End Color</label>
+                                        <input type="color" class="form-control" id="hexagonTextGradientEndColor" placeholder="Text End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonTextGradientAngle">Text Angle (°)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Text Angle (°)" value="90">
+                                        <input class="form-range-input" type="range" id="hexagonTextGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                             <div class="form-range inputContainer">
                                 <label for="hexagonTextSize">Text Size (px)</label>
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Text Size (px)" value="25">
@@ -561,27 +592,28 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="inputContainer">
+                            <fieldset class="inputContainer gradient-controls">
+                                <legend class="visually-hidden">Fill colors</legend>
                                 <div class="form-field">
                                     <input class="check gradient-toggle" type="checkbox" id="hexagonHoverGradient" aria-controls="hexagonHoverGradientOptions" onchange="HexagonSizeChange();">
                                     <label for="hexagonHoverGradient">Gradient Fill</label>
                                 </div>
-                            </div>
-                            <div class="form-floating">
-                                <label for="hexagonHoverColor" id="hexagonHoverColorLabel">Solid Color</label>
-                                <input type="color" class="form-control" id="hexagonHoverColor" placeholder="Solid Color" oninput="HexagonSizeChange();" value="#2b2f38">
-                            </div>
-                            <div id="hexagonHoverGradientOptions" hidden>
-                                <div class="form-floating">
-                                    <label for="hexagonHoverGradientEndColor">End Color</label>
-                                    <input type="color" class="form-control" id="hexagonHoverGradientEndColor" placeholder="End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                <div class="gradient-color">
+                                    <label for="hexagonHoverColor" id="hexagonHoverColorLabel">Solid Color</label>
+                                    <input type="color" class="form-control" id="hexagonHoverColor" placeholder="Solid Color" oninput="HexagonSizeChange();" value="#2b2f38">
                                 </div>
-                                <div class="form-range inputContainer">
-                                    <label for="hexagonHoverGradientAngle">Angle (°)</label>
-                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Angle (°)" value="90">
-                                    <input class="form-range-input" type="range" id="hexagonHoverGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                <div id="hexagonHoverGradientOptions" hidden>
+                                    <div class="gradient-color">
+                                        <label for="hexagonHoverGradientEndColor">End Color</label>
+                                        <input type="color" class="form-control" id="hexagonHoverGradientEndColor" placeholder="End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonHoverGradientAngle">Angle (°)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Angle (°)" value="90">
+                                        <input class="form-range-input" type="range" id="hexagonHoverGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                             <div class="form-floating">
                                 <label for="hexagonHoverImageURL">Image URL</label>
                                 <input class="form-control" id="hexagonHoverImageURL" type="url" placeholder="https://…" oninput="HexagonSizeChange();">
@@ -593,27 +625,28 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Border Size (px)" value="10">
                                 <input class="form-range-input" type="range" id="hexagonHoverBorderSize" min="0" max="150" step="1" value="10" oninput="HexagonSizeChange();">
                             </div>
-                            <div class="inputContainer">
+                            <fieldset class="inputContainer gradient-controls">
+                                <legend class="visually-hidden">Border colors</legend>
                                 <div class="form-field">
                                     <input class="check gradient-toggle" type="checkbox" id="hexagonHoverBorderGradient" aria-controls="hexagonHoverBorderGradientOptions" onchange="HexagonSizeChange();">
                                     <label for="hexagonHoverBorderGradient">Gradient Border</label>
                                 </div>
-                            </div>
-                            <div class="form-floating">
-                                <label for="hexagonHoverBorderColor" id="hexagonHoverBorderColorLabel">Border Color</label>
-                                <input type="color" class="form-control" id="hexagonHoverBorderColor" placeholder="Border Color" oninput="HexagonSizeChange();" value="#f47721">
-                            </div>
-                            <div id="hexagonHoverBorderGradientOptions" hidden>
-                                <div class="form-floating">
-                                    <label for="hexagonHoverBorderGradientEndColor">Border End Color</label>
-                                    <input type="color" class="form-control" id="hexagonHoverBorderGradientEndColor" placeholder="Border End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                <div class="gradient-color">
+                                    <label for="hexagonHoverBorderColor" id="hexagonHoverBorderColorLabel">Border Color</label>
+                                    <input type="color" class="form-control" id="hexagonHoverBorderColor" placeholder="Border Color" oninput="HexagonSizeChange();" value="#f47721">
                                 </div>
-                                <div class="form-range inputContainer">
-                                    <label for="hexagonHoverBorderGradientAngle">Border Angle (°)</label>
-                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Border Angle (°)" value="90">
-                                    <input class="form-range-input" type="range" id="hexagonHoverBorderGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                <div id="hexagonHoverBorderGradientOptions" hidden>
+                                    <div class="gradient-color">
+                                        <label for="hexagonHoverBorderGradientEndColor">Border End Color</label>
+                                        <input type="color" class="form-control" id="hexagonHoverBorderGradientEndColor" placeholder="Border End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonHoverBorderGradientAngle">Border Angle (°)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Border Angle (°)" value="90">
+                                        <input class="form-range-input" type="range" id="hexagonHoverBorderGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                         </div>
                         <div class="col">
                             <div class="form-range inputContainer">
@@ -621,27 +654,28 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Shadow Blur (px)" value="50">
                                 <input class="form-range-input" type="range" id="hexagonHoverShadowBlur" min="0" max="200" step="1" value="50" oninput="HexagonSizeChange();">
                             </div>
-                            <div class="inputContainer">
+                            <fieldset class="inputContainer gradient-controls">
+                                <legend class="visually-hidden">Shadow colors</legend>
                                 <div class="form-field">
                                     <input class="check gradient-toggle" type="checkbox" id="hexagonHoverShadowGradient" aria-controls="hexagonHoverShadowGradientOptions" onchange="HexagonSizeChange();">
                                     <label for="hexagonHoverShadowGradient">Gradient Shadow</label>
                                 </div>
-                            </div>
-                            <div class="form-floating">
-                                <label for="hexagonHoverShadowColor" id="hexagonHoverShadowColorLabel">Shadow Color</label>
-                                <input type="color" class="form-control" id="hexagonHoverShadowColor" placeholder="Shadow Color" oninput="HexagonSizeChange();" value="#00FFFF">
-                            </div>
-                            <div id="hexagonHoverShadowGradientOptions" hidden>
-                                <div class="form-floating">
-                                    <label for="hexagonHoverShadowGradientEndColor">Shadow End Color</label>
-                                    <input type="color" class="form-control" id="hexagonHoverShadowGradientEndColor" placeholder="Shadow End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                <div class="gradient-color">
+                                    <label for="hexagonHoverShadowColor" id="hexagonHoverShadowColorLabel">Shadow Color</label>
+                                    <input type="color" class="form-control" id="hexagonHoverShadowColor" placeholder="Shadow Color" oninput="HexagonSizeChange();" value="#00FFFF">
                                 </div>
-                                <div class="form-range inputContainer">
-                                    <label for="hexagonHoverShadowGradientAngle">Shadow Angle (°)</label>
-                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Shadow Angle (°)" value="90">
-                                    <input class="form-range-input" type="range" id="hexagonHoverShadowGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                <div id="hexagonHoverShadowGradientOptions" hidden>
+                                    <div class="gradient-color">
+                                        <label for="hexagonHoverShadowGradientEndColor">Shadow End Color</label>
+                                        <input type="color" class="form-control" id="hexagonHoverShadowGradientEndColor" placeholder="Shadow End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonHoverShadowGradientAngle">Shadow Angle (°)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Shadow Angle (°)" value="90">
+                                        <input class="form-range-input" type="range" id="hexagonHoverShadowGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                             <div class="form-range inputContainer">
                                 <label for="hexagonHoverShadowColorAlpha">Shadow Alpha</label>
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Shadow Alpha" value="1">
@@ -649,27 +683,28 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="inputContainer">
+                            <fieldset class="inputContainer gradient-controls">
+                                <legend class="visually-hidden">Text colors</legend>
                                 <div class="form-field">
                                     <input class="check gradient-toggle" type="checkbox" id="hexagonHoverTextGradient" aria-controls="hexagonHoverTextGradientOptions" onchange="HexagonSizeChange();">
                                     <label for="hexagonHoverTextGradient">Gradient Text</label>
                                 </div>
-                            </div>
-                            <div class="form-floating">
-                                <label for="hexagonHoverTextColor" id="hexagonHoverTextColorLabel">Text Color</label>
-                                <input type="color" class="form-control" id="hexagonHoverTextColor" placeholder="Text Color" oninput="HexagonSizeChange();" value="#f47721">
-                            </div>
-                            <div id="hexagonHoverTextGradientOptions" hidden>
-                                <div class="form-floating">
-                                    <label for="hexagonHoverTextGradientEndColor">Text End Color</label>
-                                    <input type="color" class="form-control" id="hexagonHoverTextGradientEndColor" placeholder="Text End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                <div class="gradient-color">
+                                    <label for="hexagonHoverTextColor" id="hexagonHoverTextColorLabel">Text Color</label>
+                                    <input type="color" class="form-control" id="hexagonHoverTextColor" placeholder="Text Color" oninput="HexagonSizeChange();" value="#f47721">
                                 </div>
-                                <div class="form-range inputContainer">
-                                    <label for="hexagonHoverTextGradientAngle">Text Angle (°)</label>
-                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Text Angle (°)" value="90">
-                                    <input class="form-range-input" type="range" id="hexagonHoverTextGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                <div id="hexagonHoverTextGradientOptions" hidden>
+                                    <div class="gradient-color">
+                                        <label for="hexagonHoverTextGradientEndColor">Text End Color</label>
+                                        <input type="color" class="form-control" id="hexagonHoverTextGradientEndColor" placeholder="Text End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonHoverTextGradientAngle">Text Angle (°)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Text Angle (°)" value="90">
+                                        <input class="form-range-input" type="range" id="hexagonHoverTextGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                             <div class="form-range inputContainer">
                                 <label for="hexagonHoverTextSize">Text Size (px)</label>
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Text Size (px)" value="25">
