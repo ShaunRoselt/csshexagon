@@ -62,6 +62,13 @@
             border: 1px solid #ced4da;
             border-radius: .25rem;
         }
+        .form-range.inputContainer:has(> .form-range-input:disabled) {
+            background-color: var(--bs-bg-2);
+            border-color: var(--bs-border-color);
+        }
+        .form-range.inputContainer:has(> .form-range-input:disabled) > label {
+            color: var(--bs-fg-3);
+        }
         #layHexagon > .col:first-child {
             padding-block-end: max(var(--hexagon-margin-top), var(--hexagon-hover-margin-top));
         }
@@ -282,7 +289,7 @@
                                 <label for="hexagonColor">Solid Color</label>
                                 <input type="color" class="form-control" id="hexagonColor" placeholder="Solid Color" oninput="HexagonSizeChange();" value="#2b2f38">
                             </div>
-                            <div class="form-field inputContainer">
+                            <div class="form-floating">
                                 <label for="hexagonImageURL">Image URL</label>
                                 <input class="form-control" id="hexagonImageURL" type="url" placeholder="https://…" oninput="HexagonSizeChange();">
                             </div>
@@ -350,7 +357,7 @@
                                 <label for="hexagonHoverColor">Solid Color</label>
                                 <input type="color" class="form-control" id="hexagonHoverColor" placeholder="Solid Color" oninput="HexagonSizeChange();" value="#2b2f38">
                             </div>
-                            <div class="form-field inputContainer">
+                            <div class="form-floating">
                                 <label for="hexagonHoverImageURL">Image URL</label>
                                 <input class="form-control" id="hexagonHoverImageURL" type="url" placeholder="https://…" oninput="HexagonSizeChange();">
                             </div>
