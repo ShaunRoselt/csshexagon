@@ -241,6 +241,16 @@
                 <div class="tab-pane active" id="general" role="tabpanel" aria-labelledby="general-tab">
                     <div class="row row-cols-1 sm:row-cols-2 md:row-cols-3 xl:row-cols-5 gy-3">
                         <div class="col">
+                            <div class="inputContainer">
+                                <div class="form-field">
+                                    <input class="check" type="checkbox" id="hexagonFlatTop" onchange="HexagonSizeChange();">
+                                    <label for="hexagonFlatTop">Flat Top</label>
+                                </div>
+                                <div class="form-field">
+                                    <input class="check" type="checkbox" id="hexagonVariablesCSS" onchange="HexagonSizeChange();">
+                                    <label for="hexagonVariablesCSS">Variables</label>
+                                </div>
+                            </div>
                             <div class="form-floating">
                                 <label for="hexagonSize">Size (px)</label>
                                 <input type="number" class="form-control" id="hexagonSize" placeholder="Size (px)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="300">
@@ -290,16 +300,6 @@
                                     <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="wait">wait</button>
                                     <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="zoom-in">zoom-in</button>
                                     <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="zoom-out">zoom-out</button>
-                                </div>
-                            </div>
-                            <div class="inputContainer">
-                                <div class="form-field">
-                                    <input class="check" type="checkbox" id="hexagonFlatTop" onchange="HexagonSizeChange();">
-                                    <label for="hexagonFlatTop">Flat Top</label>
-                                </div>
-                                <div class="form-field">
-                                    <input class="check" type="checkbox" id="hexagonVariablesCSS" onchange="HexagonSizeChange();">
-                                    <label for="hexagonVariablesCSS">Variables</label>
                                 </div>
                             </div>
                         </div>
