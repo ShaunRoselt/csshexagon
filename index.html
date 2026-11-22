@@ -466,8 +466,9 @@
             document.querySelectorAll("#hover .form-control, #hover .form-range-input, #hexagonHoverFlatTop").forEach((element) => {
                 element.disabled = !HexagonHover;
             });
+            const sqrt3 = Math.sqrt(3);
             function getOrientation(flatTop) {
-                const angledBorderScale = 2 / Math.sqrt(3);
+                const angledBorderScale = 2 / sqrt3;
                 return {
                     flatTop,
                     outline: flatTop
@@ -478,11 +479,13 @@
                 };
             }
 
-            function getGeometry(width, border, { flatTop, borderScaleX, borderScaleY }) {
-                const height = flatTop ? width * Math.sqrt(3) / 2 : width / Math.sqrt(3);
+            function getGeometry(size, border, { flatTop, borderScaleX, borderScaleY }) {
+                const width = flatTop ? size * 2 / sqrt3 : size;
+                const height = flatTop ? size : size / sqrt3;
                 const innerWidth = width - 2 * border * borderScaleX;
                 const textHeight = flatTop ? (height - 2 * border) / 2 : height - border * borderScaleY;
                 return {
+                    width,
                     height,
                     marginTop: flatTop ? 0 : height / 2,
                     textTop: (height - textHeight) / 2,
@@ -510,8 +513,7 @@
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             const HexagonCursor = cursorOptions.querySelector(".selected").dataset.bsValue;
             const HexagonColor = document.getElementById("hexagonColor").value; 
-            let HexagonWidth = document.getElementById("hexagonSize").value; 
-            if (HexagonWidth == "") HexagonWidth = 0;
+            const HexagonSize = document.getElementById("hexagonSize").valueAsNumber || 0;
             let HexagonBorderSize = document.getElementById("hexagonBorderSize").value;
             if (HexagonBorderSize == "") HexagonBorderSize = 0;
             const HexagonBorderColor = document.getElementById("hexagonBorderColor").value;
@@ -525,12 +527,13 @@
             if (HexagonSpanTextSize == "") HexagonSpanTextSize = 0;
             const HexagonSpanColor = document.getElementById("hexagonTextColor").value;
             const {
+                width: HexagonWidth,
                 height: HexagonHeight,
                 marginTop: HexagonMarginTop,
                 textTop: HexagonShadowSpanTop,
                 textWidth: HexagonShadowSpanWidth,
                 textHeight: HexagonShadowSpanHeight,
-            } = getGeometry(HexagonWidth, HexagonBorderSize, orientation);
+            } = getGeometry(HexagonSize, HexagonBorderSize, orientation);
             const HexagonVariablesCSS = document.getElementById("hexagonVariablesCSS").checked;
             document.documentElement.style.setProperty("--hexagon-cursor", `${HexagonCursor}`);
             document.documentElement.style.setProperty("--hexagon-width", `${HexagonWidth}px`);
@@ -553,8 +556,7 @@
             // Hover
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             const HexagonHoverColor = document.getElementById("hexagonHoverColor").value; 
-            let HexagonHoverWidth = document.getElementById("hexagonHoverSize").value; 
-            if (HexagonHoverWidth == "") HexagonHoverWidth = 0;
+            const HexagonHoverSize = document.getElementById("hexagonHoverSize").valueAsNumber || 0;
             let HexagonHoverBorderSize = document.getElementById("hexagonHoverBorderSize").value;
             if (HexagonHoverBorderSize == "") HexagonHoverBorderSize = 0;
             const HexagonHoverBorderColor = document.getElementById("hexagonHoverBorderColor").value;
@@ -567,12 +569,13 @@
             if (HexagonHoverSpanTextSize == "") HexagonHoverSpanTextSize = 0;
             const HexagonHoverSpanColor = document.getElementById("hexagonHoverTextColor").value;
             const {
+                width: HexagonHoverWidth,
                 height: HexagonHoverHeight,
                 marginTop: HexagonHoverMarginTop,
                 textTop: HexagonHoverShadowSpanTop,
                 textWidth: HexagonHoverShadowSpanWidth,
                 textHeight: HexagonHoverShadowSpanHeight,
-            } = getGeometry(HexagonHoverWidth, HexagonHoverBorderSize, hoverOrientation);
+            } = getGeometry(HexagonHoverSize, HexagonHoverBorderSize, hoverOrientation);
             let HexagonHoverTransition = document.getElementById("hexagonHoverTransition").value;
             if (HexagonHoverTransition == "") HexagonHoverTransition = 0;
             let HexagonHoverSpanTransition = document.getElementById("hexagonHoverTextTransition").value;
