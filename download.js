@@ -269,18 +269,28 @@ async function rasterize({ blob, width, height }, format) {
     return raster;
 }
 
-function transitionProgress(time, duration) {
+const easingCurves = {
+    ease: [0.25, 0.1, 0.25, 1],
+    "ease-in": [0.42, 0, 1, 1],
+    "ease-out": [0, 0, 0.58, 1],
+    "ease-in-out": [0.42, 0, 0.58, 1],
+};
+
+function transitionProgress(time, duration, easing) {
     if (time >= duration) return 1;
-    const bezier = (t, p1, p2) => 3 * (1 - t) ** 2 * t * p1 + 3 * (1 - t) * t ** 2 * p2 + t ** 3;
     const progress = time / duration;
+    if (easing === "linear") return progress;
+
+    const [x1, y1, x2, y2] = easingCurves[easing];
+    const bezier = (t, p1, p2) => 3 * (1 - t) ** 2 * t * p1 + 3 * (1 - t) * t ** 2 * p2 + t ** 3;
     let low = 0;
     let high = 1;
     for (let step = 0; step < 12; step++) {
         const mid = (low + high) / 2;
-        if (bezier(mid, 0.25, 0.25) < progress) low = mid;
+        if (bezier(mid, x1, x2) < progress) low = mid;
         else high = mid;
     }
-    return bezier((low + high) / 2, 0.1, 1);
+    return bezier((low + high) / 2, y1, y2);
 }
 
 function transitionFrame(general, hover, progress, textProgress) {
@@ -309,6 +319,8 @@ async function makeGIF() {
     const hover = document.getElementById("hexagonHover").checked ? readDesign(true) : null;
     const duration = document.getElementById("hexagonHoverTransition").valueAsNumber * 1000;
     const textDuration = document.getElementById("hexagonHoverTextTransition").valueAsNumber * 1000;
+    const easing = document.getElementById("hexagonHoverEasing").value;
+    const textEasing = document.getElementById("hexagonHoverTextEasing").value;
     const bounds = hover ? imageBounds(general, hover) : imageBounds(general);
     const generalImagePromise = general.imageURL ? embedBackground(general.imageURL) : Promise.resolve("");
     const hoverImagePromise = !hover?.imageURL ? Promise.resolve("") :
@@ -344,7 +356,9 @@ async function makeGIF() {
     if (hover) {
         for (let step = 1; step < steps; step++) {
             const time = step * delay;
-            const frame = transitionFrame(general, hover, transitionProgress(time, duration), transitionProgress(time, textDuration));
+            const progress = transitionProgress(time, duration, easing);
+            const textProgress = transitionProgress(time, textDuration, textEasing);
+            const frame = transitionFrame(general, hover, progress, textProgress);
             await writeFrame(frame, hoverImage, delay);
         }
         await writeFrame(hover, hoverImage, 700);

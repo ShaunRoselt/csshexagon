@@ -10,7 +10,10 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.css">
-    <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import "https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js";
+        enhanceEasingPickers();
+    </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/styles/default.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js"></script>
     <script type="module" src="./download.js"></script>
@@ -84,6 +87,9 @@
             display: block;
             font-size: .8125rem;
         }
+        .transition-easing > [hidden] {
+            display: none;
+        }
         .gradient-color > .form-control {
             min-height: 1.5rem;
             padding: 0;
@@ -131,29 +137,29 @@
             outline: 2px solid var(--bs-fg-2);
             outline-offset: 1px;
         }
-        .cursor-picker {
+        .option-picker {
             position: relative;
         }
-        .cursor-picker > .combobox-toggle {
+        .option-picker > .combobox-toggle {
             min-height: calc(3.75rem + 2 * var(--bs-border-width));
         }
-        .cursor-picker-label {
+        .option-picker-label {
             display: block;
             color: var(--bs-fg-3);
             font-size: .8125rem;
         }
-        .cursor-picker > .menu {
+        .option-picker > .menu {
             min-width: 100%;
             --bs-menu-max-height: min(20rem, 50dvh);
         }
-        .cursor-picker .menu-item:focus-visible {
+        .option-picker .menu-item:focus-visible {
             outline: 2px solid var(--bs-fg-2);
             outline-offset: -2px;
         }
-        .cursor-picker .menu-item.selected {
+        .option-picker .menu-item.selected {
             background-color: var(--bs-bg-2);
         }
-        .cursor-picker .menu-item.selected::after {
+        .option-picker .menu-item.selected::after {
             content: "✓" / "";
             margin-inline-start: auto;
         }
@@ -332,7 +338,7 @@
 <body>
     <header class="p-3 mb-3 border-bottom">
         <div class="d-flex flex-wrap align-items-center justify-content-center lg:justify-content-start">
-            <a href="index.html" class="d-flex align-items-center mb-2 lg:mb-0 fg-body text-decoration-none">
+            <a href="index.html" class="d-flex align-items-center mb-2 lg:mb-0 fg-body fs-lg text-decoration-none">
                 <i class="bi bi-code-square"></i>
                 <span class="ms-2">CSS Hexagon Generator</span>
             </a>
@@ -371,7 +377,9 @@
                         <button class="nav-link" id="hover-tab" data-bs-toggle="tab" data-bs-target="#hover" type="button" role="tab" aria-controls="hover" aria-selected="false">Hover</button>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center gap-2 ms-auto">
+                <div class="d-flex flex-wrap align-items-center justify-content-end gap-2 ms-auto" role="group" aria-label="Design actions">
+                    <button class="btn btn-sm btn-outline theme-secondary" type="button" id="undoDesign" autocomplete="off" disabled>Undo</button>
+                    <button class="btn btn-sm btn-outline theme-secondary" type="button" id="redoDesign" autocomplete="off" disabled>Redo</button>
                     <button class="btn btn-sm btn-outline theme-secondary" type="button" id="resetDesign">Reset</button>
                     <div class="position-relative">
                         <button class="btn btn-sm btn-outline theme-secondary" type="button" id="downloadToggle" data-bs-toggle="menu" data-bs-placement="bottom-end" aria-haspopup="menu" aria-controls="downloadMenu" aria-expanded="false">
@@ -412,12 +420,12 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Size (px)" value="300">
                                 <input class="form-range-input" type="range" id="hexagonSize" min="0" max="1000" step="1" value="300" oninput="HexagonSizeChange();">
                             </div>
-                            <div class="cursor-picker">
+                            <div class="option-picker">
                                 <button type="button" class="form-control combobox-toggle" id="hexagonCursor" data-bs-toggle="combobox"
                                         aria-labelledby="hexagonCursorLabel hexagonCursorValue" aria-controls="hexagonCursorOptions"
                                         aria-haspopup="listbox" aria-expanded="false">
                                     <span>
-                                        <span class="cursor-picker-label" id="hexagonCursorLabel">Cursor</span>
+                                        <span class="option-picker-label" id="hexagonCursorLabel">Cursor</span>
                                         <span class="combobox-value" id="hexagonCursorValue">default</span>
                                     </span>
                                     <i class="bi bi-chevron-down combobox-caret" aria-hidden="true"></i>
@@ -629,6 +637,16 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Transition (s)" value="0">
                                 <input class="form-range-input" type="range" id="hexagonHoverTransition" min="0" max="5" step="0.1" value="0" oninput="HexagonSizeChange();">
                             </div>
+                            <div class="form-floating transition-easing">
+                                <label for="hexagonHoverEasing">Transition easing</label>
+                                <select class="form-control" id="hexagonHoverEasing" onchange="HexagonSizeChange();" disabled>
+                                    <option value="ease" selected>Ease</option>
+                                    <option value="linear">Linear</option>
+                                    <option value="ease-in">Ease In</option>
+                                    <option value="ease-out">Ease Out</option>
+                                    <option value="ease-in-out">Ease In Out</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="col">
                             <fieldset class="inputContainer gradient-controls">
@@ -774,6 +792,16 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Text Transition (s)" value="0">
                                 <input class="form-range-input" type="range" id="hexagonHoverTextTransition" min="0" max="5" step="0.1" value="0" oninput="HexagonSizeChange();">
                             </div>
+                            <div class="form-floating transition-easing">
+                                <label for="hexagonHoverTextEasing">Text transition easing</label>
+                                <select class="form-control" id="hexagonHoverTextEasing" onchange="HexagonSizeChange();" disabled>
+                                    <option value="ease" selected>Ease</option>
+                                    <option value="linear">Linear</option>
+                                    <option value="ease-in">Ease In</option>
+                                    <option value="ease-out">Ease Out</option>
+                                    <option value="ease-in-out">Ease In Out</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -811,6 +839,20 @@
         </section>
     </section>
 
+    <template id="easingPicker">
+        <div class="option-picker">
+            <button type="button" class="form-control combobox-toggle" data-bs-toggle="combobox"
+                    aria-haspopup="listbox" aria-expanded="false">
+                <span>
+                    <span class="option-picker-label"></span>
+                    <span class="combobox-value"></span>
+                </span>
+                <i class="bi bi-chevron-down combobox-caret" aria-hidden="true"></i>
+            </button>
+            <div class="menu" role="listbox"></div>
+        </div>
+    </template>
+
     <script>
         function readSetting(input) {
             return input.type === "checkbox" ? (input.checked ? "1" : "0") : input.value;
@@ -835,6 +877,10 @@
                     case "color":
                         input.value = /^#[\da-f]{6}$/i.test(value) ? value : defaultValue;
                         break;
+                    case "select-one":
+                        input.value = value;
+                        if (input.selectedIndex === -1) input.value = defaultValue;
+                        break;
                     default:
                         input.value = value;
                 }
@@ -850,19 +896,80 @@
                 option.setAttribute("aria-selected", "true");
                 document.getElementById("hexagonCursorValue").textContent = requestedCursor;
             }
+            easingPickerUpdates.forEach(update => update());
+        }
+
+        const easingPickerUpdates = [];
+
+        function enhanceEasingPickers() {
+            const template = document.getElementById("easingPicker");
+            for (const select of document.querySelectorAll(".transition-easing > select")) {
+                const picker = template.content.firstElementChild.cloneNode(true);
+                const toggle = picker.querySelector(".combobox-toggle");
+                const label = picker.querySelector(".option-picker-label");
+                const value = picker.querySelector(".combobox-value");
+                const menu = picker.querySelector(".menu");
+                const nativeLabel = select.labels[0];
+
+                label.id = select.id + "Label";
+                label.textContent = nativeLabel.textContent;
+                value.id = select.id + "Value";
+                menu.id = select.id + "Options";
+                menu.setAttribute("aria-labelledby", label.id);
+                toggle.setAttribute("aria-labelledby", `${label.id} ${value.id}`);
+                toggle.setAttribute("aria-controls", menu.id);
+                toggle.disabled = select.disabled;
+
+                for (const option of select.options) {
+                    const item = document.createElement("button");
+                    item.type = "button";
+                    item.className = "menu-item";
+                    item.setAttribute("role", "option");
+                    item.tabIndex = -1;
+                    item.dataset.bsValue = option.value;
+                    item.textContent = option.textContent;
+                    menu.append(item);
+                }
+
+                const update = () => {
+                    for (const item of menu.children) {
+                        const selected = item.dataset.bsValue === select.value;
+                        item.classList.toggle("selected", selected);
+                        item.setAttribute("aria-selected", String(selected));
+                    }
+                    value.textContent = select.selectedOptions[0].textContent;
+                };
+                easingPickerUpdates.push(update);
+                select.addEventListener("change", update);
+                update();
+
+                toggle.addEventListener("shown.bs.combobox", () => menu.querySelector(".selected").focus());
+                toggle.addEventListener("change.bs.combobox", event => {
+                    select.value = event.value;
+                    select.dispatchEvent(new Event("change", { bubbles: true }));
+                });
+                nativeLabel.hidden = true;
+                select.hidden = true;
+                select.after(picker);
+            }
+        }
+
+        function designParams(params = new URLSearchParams()) {
+            for (const { input, key, defaultValue } of designSettings) {
+                const value = readSetting(input);
+                if (value === defaultValue) params.delete(key);
+                else params.set(key, value);
+            }
+            const cursor = cursorOptions.querySelector(".selected").dataset.bsValue;
+            if (cursor === defaultCursor) params.delete("cursor");
+            else params.set("cursor", cursor);
+            return params;
         }
 
         function syncDesignURL() {
             clearTimeout(shareURLTimer);
             const url = new URL(location.href);
-            for (const { input, key, defaultValue } of designSettings) {
-                const value = readSetting(input);
-                if (value === defaultValue) url.searchParams.delete(key);
-                else url.searchParams.set(key, value);
-            }
-            const cursor = cursorOptions.querySelector(".selected").dataset.bsValue;
-            if (cursor === defaultCursor) url.searchParams.delete("cursor");
-            else url.searchParams.set("cursor", cursor);
+            designParams(url.searchParams);
             if (url.href !== location.href) history.replaceState(history.state, "", url);
             return url.href;
         }
@@ -979,10 +1086,7 @@
         function getBorderSize(inputId, size) {
             const slider = document.getElementById(inputId);
             const max = String(Math.floor(size / 2));
-            if (slider.max !== max) {
-                slider.max = max;
-                slider.dispatchEvent(new Event("change", { bubbles: true }));
-            }
+            if (slider.max !== max) slider.max = max;
             return slider.value;
         }
 
@@ -1141,8 +1245,17 @@
                 marginTop: HexagonHoverMarginTop,
                 textWidth: HexagonHoverShadowSpanWidth,
             } = getGeometry(HexagonHoverSize, HexagonHoverBorderSize, hoverOrientation);
-            const HexagonHoverTransition = document.getElementById("hexagonHoverTransition").value;
-            const HexagonHoverSpanTransition = document.getElementById("hexagonHoverTextTransition").value;
+            const shapeDuration = document.getElementById("hexagonHoverTransition").valueAsNumber;
+            const textDuration = document.getElementById("hexagonHoverTextTransition").valueAsNumber;
+            const transitionValue = (duration, easingId) => {
+                if (!HexagonHover) return "0s";
+                const easing = document.getElementById(easingId).value;
+                return easing === "ease" ? `${duration}s` : `${duration}s ${easing}`;
+            };
+            const HexagonHoverTransition = transitionValue(shapeDuration, "hexagonHoverEasing");
+            const HexagonHoverSpanTransition = transitionValue(textDuration, "hexagonHoverTextEasing");
+            document.documentElement.style.setProperty("--hexagon-hover-transition", HexagonHoverTransition);
+            document.documentElement.style.setProperty("--hexagon-hover-span-transition", HexagonHoverSpanTransition);
             if (HexagonHover) {
                 document.documentElement.style.setProperty("--hexagon-hover-width", `${HexagonHoverWidth}px`);
                 document.documentElement.style.setProperty("--hexagon-hover-height", `${HexagonHoverHeight}px`);
@@ -1155,8 +1268,6 @@
                 document.documentElement.style.setProperty("--hexagon-hover-span-text-size", `${HexagonHoverSpanTextSize}px`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-color", `${HexagonHoverSpanColor}`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-width", `${HexagonHoverShadowSpanWidth}px`);
-                document.documentElement.style.setProperty("--hexagon-hover-span-transition", `${HexagonHoverSpanTransition}s`);
-                document.documentElement.style.setProperty("--hexagon-hover-transition", `${HexagonHoverTransition}s`);
             } else {
                 document.documentElement.style.setProperty("--hexagon-hover-width", `${HexagonWidth}px`);
                 document.documentElement.style.setProperty("--hexagon-hover-height", `${HexagonHeight}px`);
@@ -1169,8 +1280,6 @@
                 document.documentElement.style.setProperty("--hexagon-hover-span-text-size", `${HexagonSpanTextSize}px`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-color", `${HexagonSpanColor}`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-width", `${HexagonShadowSpanWidth}px`);
-                document.documentElement.style.setProperty("--hexagon-hover-span-transition", `0s`);
-                document.documentElement.style.setProperty("--hexagon-hover-transition", `0s`);
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             
@@ -1213,8 +1322,8 @@
     --hexagon-span-color: ${HexagonSpanColor};
     --hexagon-span-text-size: ${HexagonSpanTextSize}px;
     --hexagon-span-width: ${HexagonShadowSpanWidth}px;
-    --hexagon-hover-span-transition: ${HexagonHover ? HexagonHoverSpanTransition : 0}s;
-    --hexagon-hover-transition: ${HexagonHover ? HexagonHoverTransition : 0}s;
+    --hexagon-hover-span-transition: ${HexagonHoverSpanTransition};
+    --hexagon-hover-transition: ${HexagonHoverTransition};
     --hexagon-background: ${background};
 `;
                 if (HexagonHover) {
@@ -1274,8 +1383,8 @@
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-color)",`${HexagonHoverSpanColor}`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-text-size)",`${HexagonHoverSpanTextSize}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-width)",`${HexagonHoverShadowSpanWidth}px`);
-                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-transition)", `${HexagonHover ? HexagonHoverSpanTransition : 0}s`);
-                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-transition)", `${HexagonHover ? HexagonHoverTransition : 0}s`);
+                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-transition)", HexagonHoverSpanTransition);
+                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-transition)", HexagonHoverTransition);
                 for (const [name, value] of gradientProperties) {
                     HexagonCodeCSS = HexagonCodeCSS.replaceAll(`var(${name})`, value);
                 }
@@ -1316,6 +1425,7 @@
                 editor.value = slider.value;
                 if (slider.value !== previous) {
                     slider.dispatchEvent(new Event("input", { bubbles: true }));
+                    recordDesignEdit();
                 }
             };
             editor.addEventListener("change", commitValue);
@@ -1331,11 +1441,13 @@
         const cursorPicker = document.getElementById("hexagonCursor");
         const cursorOptions = document.getElementById("hexagonCursorOptions");
         const defaultCursor = cursorOptions.querySelector(".selected").dataset.bsValue;
-        const designSettings = Array.from(document.querySelectorAll("#myTabContent input[id]"), input => {
+        const settingsPanel = document.getElementById("myTabContent");
+        const designSettings = Array.from(settingsPanel.querySelectorAll("input[id], select[id]"), input => {
             const name = input.id.slice("hexagon".length);
             let defaultValue = input.defaultValue;
             if (input.type === "checkbox") defaultValue = input.defaultChecked ? "1" : "0";
             if (input.type === "color") defaultValue = defaultValue.toLowerCase();
+            if (input.type === "select-one") defaultValue = input.querySelector("option[selected]").value;
             return { input, key: name[0].toLowerCase() + name.slice(1), defaultValue };
         });
         const copyFeedback = new WeakMap();
@@ -1348,6 +1460,7 @@
         });
         cursorPicker.addEventListener("change.bs.combobox", () => {
             HexagonSizeChange();
+            recordDesignEdit();
         });
         document.addEventListener("command", event => {
             if (event.command === "--copy-code") {
@@ -1357,13 +1470,60 @@
         document.getElementById("copyDesignLink").addEventListener("click", event => {
             copyText(event.currentTarget, syncDesignURL(), "Copy the address bar link", document.getElementById("copyLinkStatus"), "");
         });
-        document.getElementById("resetDesign").addEventListener("click", () => {
-            restoreDesign(new URLSearchParams());
-            HexagonSizeChange();
-            syncDesignURL();
-        });
         restoreDesign(new URLSearchParams(location.search));
         HexagonSizeChange();
+
+        const undoButton = document.getElementById("undoDesign");
+        const redoButton = document.getElementById("redoDesign");
+        const designHistory = [designParams().toString()];
+        let designHistoryIndex = 0;
+        updateHistoryButtons(designHistory[0]);
+
+        function updateHistoryButtons(state = designParams().toString()) {
+            const pending = state !== designHistory[designHistoryIndex];
+            undoButton.disabled = designHistoryIndex === 0 && !pending;
+            redoButton.disabled = designHistoryIndex === designHistory.length - 1 || pending;
+        }
+
+        function recordDesignEdit() {
+            const state = designParams().toString();
+            if (state !== designHistory[designHistoryIndex]) {
+                designHistory.length = designHistoryIndex + 1;
+                designHistory.push(state);
+                designHistoryIndex += 1;
+            }
+            updateHistoryButtons(state);
+        }
+
+        function applyDesign(params) {
+            restoreDesign(params);
+            HexagonSizeChange();
+            syncDesignURL();
+        }
+
+        function stepDesignHistory(direction) {
+            if (direction < 0) recordDesignEdit();
+            const index = designHistoryIndex + direction;
+            if (index < 0 || index >= designHistory.length) return;
+
+            designHistoryIndex = index;
+            applyDesign(new URLSearchParams(designHistory[index]));
+            updateHistoryButtons();
+        }
+
+        settingsPanel.addEventListener("input", event => {
+            if (event.target.id) updateHistoryButtons();
+        });
+        settingsPanel.addEventListener("change", event => {
+            if (event.target.id) recordDesignEdit();
+        });
+        undoButton.addEventListener("click", () => stepDesignHistory(-1));
+        redoButton.addEventListener("click", () => stepDesignHistory(1));
+        document.getElementById("resetDesign").addEventListener("click", () => {
+            recordDesignEdit();
+            applyDesign(new URLSearchParams());
+            recordDesignEdit();
+        });
     </script>
     
     <!-- Default Statcounter code -->
