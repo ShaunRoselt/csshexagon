@@ -61,12 +61,31 @@
             background-color: var(--bs-bg-2);
             border-color: var(--bs-border-color);
         }
-        .form-range.inputContainer:has(> .form-range-input:disabled) > :is(label, output) {
+        .form-range.inputContainer:has(> .form-range-input:disabled) > :is(label, .range-value) {
             color: var(--bs-fg-3);
         }
-        .form-range > output {
+        .range-value {
             float: inline-end;
+            inline-size: 6ch;
+            box-sizing: content-box;
+            padding: 0 .25rem;
+            border: 1px solid var(--bs-border-color);
+            border-radius: .25rem;
+            background-color: transparent;
+            color: inherit;
+            font: inherit;
             font-variant-numeric: tabular-nums;
+            text-align: end;
+            appearance: textfield;
+        }
+        .range-value::-webkit-inner-spin-button,
+        .range-value::-webkit-outer-spin-button {
+            appearance: none;
+            margin: 0;
+        }
+        .range-value:focus-visible {
+            outline: 2px solid var(--bs-fg-2);
+            outline-offset: 1px;
         }
         .cursor-picker {
             position: relative;
@@ -263,9 +282,12 @@
                         <button class="nav-link" id="hover-tab" data-bs-toggle="tab" data-bs-target="#hover" type="button" role="tab" aria-controls="hover" aria-selected="false">Hover</button>
                     </li>
                 </ul>
-                <div class="copy-action">
-                    <span role="status"></span>
-                    <button class="btn btn-sm btn-outline theme-secondary" type="button" id="copyDesignLink">Copy link</button>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline theme-secondary" type="button" id="resetDesign">Reset</button>
+                    <div class="copy-action">
+                        <span role="status"></span>
+                        <button class="btn btn-sm btn-outline theme-secondary" type="button" id="copyDesignLink">Copy link</button>
+                    </div>
                 </div>
             </div>
             <div class="tab-content mt-3" id="myTabContent">
@@ -284,7 +306,7 @@
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonSize">Size (px)</label>
-                                <output for="hexagonSize" aria-hidden="true">300</output>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Size (px)" value="300">
                                 <input class="form-range-input" type="range" id="hexagonSize" min="0" max="1000" step="1" value="300" oninput="HexagonSizeChange();">
                             </div>
                             <div class="cursor-picker">
@@ -348,7 +370,7 @@
                         <div class="col">
                             <div class="form-range inputContainer">
                                 <label for="hexagonBorderSize">Border Size (px)</label>
-                                <output for="hexagonBorderSize" aria-hidden="true">10</output>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Border Size (px)" value="10">
                                 <input class="form-range-input" type="range" id="hexagonBorderSize" min="0" max="150" step="1" value="10" oninput="HexagonSizeChange();">
                             </div>
                             <div class="form-floating">
@@ -359,7 +381,7 @@
                         <div class="col">
                             <div class="form-range inputContainer">
                                 <label for="hexagonShadowBlur">Shadow Blur (px)</label>
-                                <output for="hexagonShadowBlur" aria-hidden="true">50</output>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Shadow Blur (px)" value="50">
                                 <input class="form-range-input" type="range" id="hexagonShadowBlur" min="0" max="200" step="1" value="50" oninput="HexagonSizeChange();">
                             </div>
                             <div class="form-floating">
@@ -368,6 +390,7 @@
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonShadowColorAlpha">Shadow Alpha</label>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Shadow Alpha" value="1">
                                 <input class="form-range-input" type="range" id="hexagonShadowColorAlpha" oninput="HexagonSizeChange();" min="0" max="1" step="0.01" value="1">
                             </div>
                         </div>
@@ -382,7 +405,7 @@
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonTextSize">Text Size (px)</label>
-                                <output for="hexagonTextSize" aria-hidden="true">25</output>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Text Size (px)" value="25">
                                 <input class="form-range-input" type="range" id="hexagonTextSize" min="0" max="150" step="1" value="25" oninput="HexagonSizeChange();">
                             </div>
                         </div>
@@ -403,12 +426,12 @@
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonHoverSize">Size (px)</label>
-                                <output for="hexagonHoverSize" aria-hidden="true">300</output>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Size (px)" value="300">
                                 <input class="form-range-input" type="range" id="hexagonHoverSize" min="0" max="1000" step="1" value="300" oninput="HexagonSizeChange();">
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonHoverTransition">Transition (s)</label>
-                                <output for="hexagonHoverTransition" aria-hidden="true">0</output>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Transition (s)" value="0">
                                 <input class="form-range-input" type="range" id="hexagonHoverTransition" min="0" max="5" step="0.1" value="0" oninput="HexagonSizeChange();">
                             </div>
                         </div>
@@ -425,7 +448,7 @@
                         <div class="col">
                             <div class="form-range inputContainer">
                                 <label for="hexagonHoverBorderSize">Border Size (px)</label>
-                                <output for="hexagonHoverBorderSize" aria-hidden="true">10</output>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Border Size (px)" value="10">
                                 <input class="form-range-input" type="range" id="hexagonHoverBorderSize" min="0" max="150" step="1" value="10" oninput="HexagonSizeChange();">
                             </div>
                             <div class="form-floating">
@@ -436,7 +459,7 @@
                         <div class="col">
                             <div class="form-range inputContainer">
                                 <label for="hexagonHoverShadowBlur">Shadow Blur (px)</label>
-                                <output for="hexagonHoverShadowBlur" aria-hidden="true">50</output>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Shadow Blur (px)" value="50">
                                 <input class="form-range-input" type="range" id="hexagonHoverShadowBlur" min="0" max="200" step="1" value="50" oninput="HexagonSizeChange();">
                             </div>
                             <div class="form-floating">
@@ -445,6 +468,7 @@
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonHoverShadowColorAlpha">Shadow Alpha</label>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Shadow Alpha" value="1">
                                 <input class="form-range-input" type="range" id="hexagonHoverShadowColorAlpha" oninput="HexagonSizeChange();" min="0" max="1" step="0.01" value="1">
                             </div>
                         </div>
@@ -455,12 +479,12 @@
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonHoverTextSize">Text Size (px)</label>
-                                <output for="hexagonHoverTextSize" aria-hidden="true">25</output>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Text Size (px)" value="25">
                                 <input class="form-range-input" type="range" id="hexagonHoverTextSize" min="0" max="150" step="1" value="25" oninput="HexagonSizeChange();">
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonHoverTextTransition">Transition (s)</label>
-                                <output for="hexagonHoverTextTransition" aria-hidden="true">0</output>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Text Transition (s)" value="0">
                                 <input class="form-range-input" type="range" id="hexagonHoverTextTransition" min="0" max="5" step="0.1" value="0" oninput="HexagonSizeChange();">
                             </div>
                         </div>
@@ -505,30 +529,30 @@
             return input.type === "checkbox" ? (input.checked ? "1" : "0") : input.value;
         }
 
-        function restoreDesign() {
-            const params = new URLSearchParams(location.search);
+        function restoreDesign(params) {
             for (const prefix of ["hexagon", "hexagonHover"]) {
                 const sizeSlider = document.getElementById(prefix + "Size");
                 document.getElementById(prefix + "BorderSize").max = Math.floor(sizeSlider.max / 2);
             }
-            for (const { input, key } of designSettings) {
-                const value = params.get(key);
-                if (value === null) continue;
+            for (const { input, key, defaultValue } of designSettings) {
+                const value = params.get(key) ?? defaultValue;
                 switch (input.type) {
                     case "checkbox":
-                        if (value === "1" || value === "0") input.checked = value === "1";
+                        input.checked = (value === "1" || value === "0" ? value : defaultValue) === "1";
                         break;
-                    case "range":
-                        if (value.trim() && Number.isFinite(Number(value))) input.valueAsNumber = Number(value);
+                    case "range": {
+                        const number = Number(value);
+                        input.valueAsNumber = value.trim() && Number.isFinite(number) ? number : Number(defaultValue);
                         break;
+                    }
                     case "color":
-                        if (/^#[\da-f]{6}$/i.test(value)) input.value = value;
+                        input.value = /^#[\da-f]{6}$/i.test(value) ? value : defaultValue;
                         break;
                     default:
                         input.value = value;
                 }
             }
-            const requestedCursor = params.get("cursor");
+            const requestedCursor = params.get("cursor") ?? defaultCursor;
             const option = Array.from(cursorOptions.querySelectorAll("[data-bs-value]"))
                 .find(item => item.dataset.bsValue === requestedCursor);
             if (option) {
@@ -542,6 +566,7 @@
         }
 
         function syncDesignURL() {
+            clearTimeout(shareURLTimer);
             const url = new URL(location.href);
             for (const { input, key, defaultValue } of designSettings) {
                 const value = readSetting(input);
@@ -847,8 +872,10 @@
     <span>${escapedText}</span>
 </div>`;
 
-            for (const output of sliderOutputs) {
-                output.value = document.getElementById(output.htmlFor.value).value;
+            for (const { editor, slider } of rangeEditors) {
+                editor.max = slider.max;
+                editor.value = slider.value;
+                editor.disabled = slider.disabled;
             }
             for (const codeBlock of [layHexagonCodeHTML, layHexagonCodeCSS]) {
                 // The generated text replaced the previous highlighting.
@@ -858,13 +885,41 @@
             clearTimeout(shareURLTimer);
             shareURLTimer = setTimeout(syncDesignURL, 300);
         }
-        const sliderOutputs = document.querySelectorAll(".form-range > output");
+        const rangeEditors = Array.from(document.querySelectorAll(".range-value"), editor => ({
+            editor,
+            slider: editor.nextElementSibling,
+        }));
+        for (const { editor, slider } of rangeEditors) {
+            editor.min = slider.min;
+            editor.step = slider.step;
+            editor.addEventListener("focus", () => editor.select());
+            const commitValue = () => {
+                const previous = slider.value;
+                if (Number.isFinite(editor.valueAsNumber)) slider.valueAsNumber = editor.valueAsNumber;
+                editor.value = slider.value;
+                if (slider.value !== previous) {
+                    slider.dispatchEvent(new Event("input", { bubbles: true }));
+                }
+            };
+            editor.addEventListener("change", commitValue);
+            editor.addEventListener("keydown", event => {
+                if (event.isComposing) return;
+                if (event.key === "Escape") editor.value = slider.value;
+                else if (event.key === "Enter") commitValue();
+                else return;
+                event.preventDefault();
+                editor.select();
+            });
+        }
         const cursorPicker = document.getElementById("hexagonCursor");
         const cursorOptions = document.getElementById("hexagonCursorOptions");
         const defaultCursor = cursorOptions.querySelector(".selected").dataset.bsValue;
         const designSettings = Array.from(document.querySelectorAll("#myTabContent input[id]"), input => {
             const name = input.id.slice("hexagon".length);
-            return { input, key: name[0].toLowerCase() + name.slice(1), defaultValue: readSetting(input) };
+            let defaultValue = input.defaultValue;
+            if (input.type === "checkbox") defaultValue = input.defaultChecked ? "1" : "0";
+            if (input.type === "color") defaultValue = defaultValue.toLowerCase();
+            return { input, key: name[0].toLowerCase() + name.slice(1), defaultValue };
         });
         const copyFeedback = new WeakMap();
         let shareURLTimer;
@@ -883,10 +938,14 @@
             }
         }, true);
         document.getElementById("copyDesignLink").addEventListener("click", event => {
-            clearTimeout(shareURLTimer);
             copyText(event.currentTarget, syncDesignURL(), "Copy the address bar link");
         });
-        restoreDesign();
+        document.getElementById("resetDesign").addEventListener("click", () => {
+            restoreDesign(new URLSearchParams());
+            HexagonSizeChange();
+            syncDesignURL();
+        });
+        restoreDesign(new URLSearchParams(location.search));
         HexagonSizeChange();
     </script>
     
