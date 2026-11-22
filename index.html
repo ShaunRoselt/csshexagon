@@ -181,7 +181,7 @@
                 <div class="menu" id="profileMenu" aria-labelledby="profileMenuToggle">
                     <a class="menu-item" target="_blank" href="https://www.shaunroselt.com/"><i class="bi bi-globe"></i> Personal Website</a>
                     <a class="menu-item" target="_blank" href="https://www.facebook.com/shaunroselt0"><i class="bi bi-facebook"></i> Facebook</a>
-                    <a class="menu-item" target="_blank" href="https://twitter.com/shaunroselt"><i class="bi bi-twitter"></i> Twitter</a>
+                    <a class="menu-item" target="_blank" href="https://x.com/shaunroselt"><i class="bi bi-twitter-x" aria-hidden="true"></i> X</a>
                     <a class="menu-item" target="_blank" href="https://www.instagram.com/shaun.roselt/"><i class="bi bi-instagram"></i> Instagram</a>
                     <a class="menu-item" target="_blank" href="https://www.youtube.com/ShaunRoselt?sub_confirmation=1"><i class="bi bi-youtube"></i> YouTube</a>
                     <a class="menu-item" target="_blank" href="https://za.linkedin.com/in/shaunroselt"><i class="bi bi-linkedin"></i> LinkedIn</a>
@@ -257,11 +257,11 @@
                         </div>
                         <div class="col">
                             <div class="inputContainer">
-                                <div class="d-inline-flex align-items-center gap-2 me-2">
+                                <div class="form-field">
                                     <input class="radio" type="radio" name="hexagonBackgroundChecks" id="hexagonBackgroundCheck1" value="option1" checked>
                                     <label for="hexagonBackgroundCheck1">Solid Color</label>
                                 </div>
-                                <div class="d-inline-flex align-items-center gap-2 me-2">
+                                <div class="form-field">
                                     <input class="radio" type="radio" name="hexagonBackgroundChecks" id="hexagonBackgroundCheck2" value="option2" disabled>
                                     <label for="hexagonBackgroundCheck2">Image</label>
                                 </div>
@@ -331,11 +331,11 @@
                         </div>
                         <div class="col">
                             <div class="inputContainer">
-                                <div class="d-inline-flex align-items-center gap-2 me-2">
+                                <div class="form-field">
                                     <input class="radio" type="radio" name="hexagonHoverBackgroundChecks" id="hexagonHoverBackgroundCheck1" value="option1" checked>
                                     <label for="hexagonHoverBackgroundCheck1">Solid Color</label>
                                 </div>
-                                <div class="d-inline-flex align-items-center gap-2 me-2">
+                                <div class="form-field">
                                     <input class="radio" type="radio" name="hexagonHoverBackgroundChecks" id="hexagonHoverBackgroundCheck2" value="option2" disabled>
                                     <label for="hexagonHoverBackgroundCheck2">Image</label>
                                 </div>
@@ -463,7 +463,7 @@
             document.documentElement.style.setProperty("--hexagon-border-beforeafter-width", `${HexagonBorderBeforeAfterWidth}px`);
             document.documentElement.style.setProperty("--hexagon-shadow-blur", `${HexagonShadowBlur}px`);
             document.documentElement.style.setProperty("--hexagon-shadow-color", `rgba(${HexagonShadowColorArrayRGB[0]},${HexagonShadowColorArrayRGB[1]},${HexagonShadowColorArrayRGB[2]},${HexagonShadowColorAlpha})`);
-            document.getElementById("layHexagonText").innerHTML = HexagonSpanText;
+            document.getElementById("layHexagonText").textContent = HexagonSpanText;
             document.documentElement.style.setProperty("--hexagon-span-text-size", `${HexagonSpanTextSize}px`);
             document.documentElement.style.setProperty("--hexagon-span-color", `${HexagonSpanColor}`);
             document.documentElement.style.setProperty("--hexagon-span-top", `${HexagonShadowSpanTop}px`);
@@ -546,7 +546,7 @@
             
             const layHexagonCodeCSS = document.getElementById("layHexagonCodeCSS");
             if (HexagonVariablesCSS){
-                layHexagonCodeCSS.innerHTML =
+                layHexagonCodeCSS.textContent =
 `:root {
     --hexagon-cursor: ${HexagonCursor};
     --hexagon-width: ${HexagonWidth}px;
@@ -568,7 +568,7 @@
     --hexagon-span-height: ${HexagonShadowSpanHeight}px;
 `;
                 if (HexagonHover) {
-                    layHexagonCodeCSS.innerHTML = layHexagonCodeCSS.innerHTML + 
+                    layHexagonCodeCSS.textContent +=
 `    
     --hexagon-hover-width: ${HexagonHoverWidth}px;
     --hexagon-hover-height: ${HexagonHoverHeight}px;
@@ -592,7 +592,7 @@
     --hexagon-hover-transition: ${HexagonHoverTransition}s;
 `;
                 }
-                layHexagonCodeCSS.innerHTML = layHexagonCodeCSS.innerHTML + `}
+                layHexagonCodeCSS.textContent += `}
 ` + document.getElementById("HexagonCodeCSS").innerHTML + document.getElementById("HexagonHoverCodeCSS").innerHTML;
             } else {
                 let HexagonCodeCSS = document.getElementById("HexagonCodeCSS").innerHTML + document.getElementById("HexagonHoverCodeCSS").innerHTML;
@@ -635,16 +635,20 @@
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-height)",`${HexagonHoverShadowSpanHeight}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-transition)",`${HexagonHoverSpanTransition}s`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-transition)",`${HexagonHoverTransition}s`);
-                layHexagonCodeCSS.innerHTML = HexagonCodeCSS;
+                layHexagonCodeCSS.textContent = HexagonCodeCSS;
             }
-            let HexagonHTML = 
+            const escapedText = HexagonSpanText.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+            const layHexagonCodeHTML = document.getElementById("layHexagonCodeHTML");
+            layHexagonCodeHTML.textContent =
 `<div class="hexagon">
-    <span>${HexagonSpanText}</span>
+    <span>${escapedText}</span>
 </div>`;
-            HexagonHTML = HexagonHTML.replaceAll("<","&lt;");
-            HexagonHTML = HexagonHTML.replaceAll(">","&gt");
-            document.getElementById("layHexagonCodeHTML").innerHTML = HexagonHTML;
-            hljs.highlightAll();
+
+            for (const codeBlock of [layHexagonCodeHTML, layHexagonCodeCSS]) {
+                // The generated text replaced the previous highlighting.
+                delete codeBlock.dataset.highlighted;
+                window.hljs?.highlightElement(codeBlock);
+            }
         }
         HexagonSizeChange();
     </script>
