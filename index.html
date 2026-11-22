@@ -808,19 +808,19 @@
             return url.href;
         }
 
-        async function copyText(button, value, failureMessage, status = button.previousElementSibling) {
+        async function copyText(button, value, failureMessage, status = button.previousElementSibling, successMessage = "Copied") {
             const previous = copyFeedback.get(button);
             clearTimeout(previous?.timer);
             const feedback = {};
             copyFeedback.set(button, feedback);
             status.textContent = "";
-            let message = "Copied";
+            let message = successMessage;
             try {
                 await navigator.clipboard.writeText(value);
             } catch {
                 message = failureMessage;
             }
-            if (copyFeedback.get(button) !== feedback) return;
+            if (!message || copyFeedback.get(button) !== feedback) return;
             feedback.message = message === previous?.message ? message + "\u00a0" : message;
             status.textContent = feedback.message;
             feedback.timer = setTimeout(() => status.textContent = "", 3000);
@@ -1258,7 +1258,7 @@
             }
         }, true);
         document.getElementById("copyDesignLink").addEventListener("click", event => {
-            copyText(event.currentTarget, syncDesignURL(), "Copy the address bar link", document.getElementById("copyLinkStatus"));
+            copyText(event.currentTarget, syncDesignURL(), "Copy the address bar link", document.getElementById("copyLinkStatus"), "");
         });
         document.getElementById("resetDesign").addEventListener("click", () => {
             restoreDesign(new URLSearchParams());
