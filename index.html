@@ -54,6 +54,25 @@
             border: 1px solid #ced4da;
             border-radius: .25rem;
         }
+        .image-controls {
+            min-inline-size: 0;
+            padding: 0;
+        }
+        .image-controls .form-control {
+            border-color: transparent;
+            background-color: transparent;
+            box-shadow: none;
+        }
+        .image-controls .form-control:focus-visible {
+            outline: 2px solid var(--bs-fg-2);
+            outline-offset: -2px;
+        }
+        .image-framing:not([hidden]) {
+            padding: 0 .75rem .375rem;
+            display: grid;
+            gap: .5rem;
+            min-inline-size: 0;
+        }
         .gradient-controls {
             min-inline-size: 0;
         }
@@ -76,7 +95,8 @@
             outline: 2px solid var(--bs-fg-2);
             outline-offset: 1px;
         }
-        .gradient-controls:has(.gradient-toggle:disabled) {
+        .gradient-controls:has(.gradient-toggle:disabled),
+        .image-controls:has(.form-control:disabled) {
             background-color: var(--bs-bg-2);
             border-color: var(--bs-border-color);
             color: var(--bs-fg-3);
@@ -196,7 +216,7 @@
 .hexagon::after {
     inset: calc(var(--hexagon-border-width) * var(--hexagon-border-scale-y) - var(--hexagon-margin-top))
            calc(var(--hexagon-border-width) * var(--hexagon-border-scale-x));
-    background: var(--hexagon-background-image) center / cover no-repeat var(--hexagon-color);
+    background: var(--hexagon-background) var(--hexagon-color);
 }
 
 .hexagon > span {
@@ -238,8 +258,7 @@
 .hexagon:hover::after {
     inset: calc(var(--hexagon-hover-border-width) * var(--hexagon-hover-border-scale-y) - var(--hexagon-hover-margin-top))
            calc(var(--hexagon-hover-border-width) * var(--hexagon-hover-border-scale-x));
-    background-color: var(--hexagon-hover-color);
-    background-image: var(--hexagon-hover-background-image);
+    background: var(--hexagon-hover-background) var(--hexagon-hover-color);
 }
 
 .hexagon > span::before {
@@ -464,10 +483,30 @@
                                     </div>
                                 </div>
                             </fieldset>
-                            <div class="form-floating">
-                                <label for="hexagonImageURL">Image URL</label>
-                                <input class="form-control" id="hexagonImageURL" type="url" placeholder="https://…" oninput="HexagonSizeChange();">
-                            </div>
+                            <fieldset class="inputContainer image-controls">
+                                <legend class="visually-hidden">Background image</legend>
+                                <div class="form-floating">
+                                    <label for="hexagonImageURL">Image URL</label>
+                                    <input class="form-control" id="hexagonImageURL" type="url" placeholder="https://…" oninput="HexagonSizeChange();">
+                                </div>
+                                <div class="image-framing" id="hexagonImageFraming" hidden>
+                                    <div class="form-range">
+                                        <label for="hexagonImageX">X position (%)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact X position (%)" value="50">
+                                        <input class="form-range-input" type="range" id="hexagonImageX" min="0" max="100" step="1" value="50" oninput="HexagonSizeChange();">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonImageY">Y position (%)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Y position (%)" value="50">
+                                        <input class="form-range-input" type="range" id="hexagonImageY" min="0" max="100" step="1" value="50" oninput="HexagonSizeChange();">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonImageZoom">Zoom (%)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact zoom (%)" value="100">
+                                        <input class="form-range-input" type="range" id="hexagonImageZoom" min="100" max="300" step="1" value="100" oninput="HexagonSizeChange();">
+                                    </div>
+                                </div>
+                            </fieldset>
                         </div>
                         <div class="col">
                             <div class="form-range inputContainer">
@@ -614,10 +653,30 @@
                                     </div>
                                 </div>
                             </fieldset>
-                            <div class="form-floating">
-                                <label for="hexagonHoverImageURL">Image URL</label>
-                                <input class="form-control" id="hexagonHoverImageURL" type="url" placeholder="https://…" oninput="HexagonSizeChange();">
-                            </div>
+                            <fieldset class="inputContainer image-controls">
+                                <legend class="visually-hidden">Background image</legend>
+                                <div class="form-floating">
+                                    <label for="hexagonHoverImageURL">Image URL</label>
+                                    <input class="form-control" id="hexagonHoverImageURL" type="url" placeholder="https://…" oninput="HexagonSizeChange();">
+                                </div>
+                                <div class="image-framing" id="hexagonHoverImageFraming" hidden>
+                                    <div class="form-range">
+                                        <label for="hexagonHoverImageX">X position (%)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact X position (%)" value="50">
+                                        <input class="form-range-input" type="range" id="hexagonHoverImageX" min="0" max="100" step="1" value="50" oninput="HexagonSizeChange();">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonHoverImageY">Y position (%)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Y position (%)" value="50">
+                                        <input class="form-range-input" type="range" id="hexagonHoverImageY" min="0" max="100" step="1" value="50" oninput="HexagonSizeChange();">
+                                    </div>
+                                    <div class="form-range">
+                                        <label for="hexagonHoverImageZoom">Zoom (%)</label>
+                                        <input class="range-value" type="number" inputmode="numeric" aria-label="Exact zoom (%)" value="100">
+                                        <input class="form-range-input" type="range" id="hexagonHoverImageZoom" min="100" max="300" step="1" value="100" oninput="HexagonSizeChange();">
+                                    </div>
+                                </div>
+                            </fieldset>
                         </div>
                         <div class="col">
                             <div class="form-range inputContainer">
@@ -874,15 +933,47 @@
             return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
         }
 
-        function getBackgroundImage(prefix) {
-            const url = getImageURL(prefix + "ImageURL");
+        function getImageFraming(prefix) {
+            return {
+                x: document.getElementById(prefix + "ImageX").valueAsNumber,
+                y: document.getElementById(prefix + "ImageY").valueAsNumber,
+                zoom: document.getElementById(prefix + "ImageZoom").valueAsNumber,
+            };
+        }
+
+        const framingImages = new Map();
+
+        function getFramingImage(prefix, url) {
+            const current = framingImages.get(prefix);
+            if (current?.url === url) return current.image;
+
+            const image = new Image();
+            framingImages.set(prefix, { url, image });
+            image.addEventListener("load", () => {
+                if (framingImages.get(prefix)?.image === image && getImageURL(prefix + "ImageURL") === url) {
+                    HexagonSizeChange();
+                }
+            }, { once: true });
+            image.src = url;
+            return image;
+        }
+
+        function getBackground(prefix, url, frameRatio) {
             const gradient = getGradient(prefix);
             const layers = [];
-            if (url) layers.push(`url(${JSON.stringify(url)})`);
-            if (gradient) {
-                layers.push(gradientCSS(gradient));
+            if (url) {
+                const { x, y, zoom } = getImageFraming(prefix);
+                let size = "cover";
+                if (zoom !== 100) {
+                    const image = getFramingImage(prefix, url);
+                    if (image.naturalWidth && image.naturalHeight) {
+                        size = image.naturalWidth / image.naturalHeight > frameRatio ? `auto ${zoom}%` : `${zoom}% auto`;
+                    }
+                }
+                layers.push(`url(${JSON.stringify(url)}) ${x}% ${y}% / ${size} no-repeat`);
             }
-            return layers.join(", ") || "none";
+            if (gradient) layers.push(`${gradientCSS(gradient)} center / cover no-repeat`);
+            return layers.join(", ") || "none center / cover no-repeat";
         }
 
         function getBorderSize(inputId, size) {
@@ -953,8 +1044,14 @@
             document.documentElement.style.setProperty("--hexagon-hover-outline", hoverOrientation.outline);
             document.documentElement.style.setProperty("--hexagon-hover-border-scale-x", hoverOrientation.borderScaleX);
             document.documentElement.style.setProperty("--hexagon-hover-border-scale-y", hoverOrientation.borderScaleY);
-            const backgroundImage = getBackgroundImage("hexagon");
-            const hoverBackgroundImage = HexagonHover ? getBackgroundImage("hexagonHover") : backgroundImage;
+            const imageURL = getImageURL("hexagonImageURL");
+            const hoverImageURL = getImageURL("hexagonHoverImageURL");
+            document.getElementById("hexagonImageFraming").hidden = !imageURL;
+            document.getElementById("hexagonHoverImageFraming").hidden = !hoverImageURL;
+            const background = getBackground("hexagon", imageURL, orientation.borderScaleX / orientation.borderScaleY);
+            const hoverBackground = HexagonHover
+                ? getBackground("hexagonHover", hoverImageURL, hoverOrientation.borderScaleX / hoverOrientation.borderScaleY)
+                : background;
 
             const generalTextGradient = getGradient("hexagonText");
             const hoverTextGradient = HexagonHover ? getGradient("hexagonHoverText") : generalTextGradient;
@@ -985,8 +1082,8 @@
             }
             for (const [name, value] of gradientProperties) document.documentElement.style.setProperty(name, value);
 
-            document.documentElement.style.setProperty("--hexagon-background-image", backgroundImage);
-            document.documentElement.style.setProperty("--hexagon-hover-background-image", hoverBackgroundImage);
+            document.documentElement.style.setProperty("--hexagon-background", background);
+            document.documentElement.style.setProperty("--hexagon-hover-background", hoverBackground);
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // General
@@ -1118,14 +1215,14 @@
     --hexagon-span-width: ${HexagonShadowSpanWidth}px;
     --hexagon-hover-span-transition: ${HexagonHover ? HexagonHoverSpanTransition : 0}s;
     --hexagon-hover-transition: ${HexagonHover ? HexagonHoverTransition : 0}s;
-    --hexagon-background-image: ${backgroundImage};
+    --hexagon-background: ${background};
 `;
                 if (HexagonHover) {
                     layHexagonCodeCSS.textContent +=
 `    --hexagon-hover-outline: ${hoverOrientation.outline};
     --hexagon-hover-border-scale-x: ${hoverOrientation.borderScaleX};
     --hexagon-hover-border-scale-y: ${hoverOrientation.borderScaleY};
-    --hexagon-hover-background-image: ${hoverBackgroundImage};
+    --hexagon-hover-background: ${hoverBackground};
     --hexagon-hover-width: ${HexagonHoverWidth}px;
     --hexagon-hover-height: ${HexagonHoverHeight}px;
     --hexagon-hover-margin-top: ${HexagonHoverMarginTop}px;
@@ -1182,8 +1279,8 @@
                 for (const [name, value] of gradientProperties) {
                     HexagonCodeCSS = HexagonCodeCSS.replaceAll(`var(${name})`, value);
                 }
-                layHexagonCodeCSS.textContent = HexagonCodeCSS.replace(/var\(--hexagon-(hover-)?background-image\)/g,
-                    (_, hover) => hover ? hoverBackgroundImage : backgroundImage);
+                layHexagonCodeCSS.textContent = HexagonCodeCSS.replace(/var\(--hexagon-(hover-)?background\)/g,
+                    (_, hover) => hover ? hoverBackground : background);
             }
             const escapedText = HexagonSpanText.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
             const layHexagonCodeHTML = document.getElementById("layHexagonCodeHTML");
