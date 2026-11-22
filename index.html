@@ -61,8 +61,12 @@
             background-color: var(--bs-bg-2);
             border-color: var(--bs-border-color);
         }
-        .form-range.inputContainer:has(> .form-range-input:disabled) > label {
+        .form-range.inputContainer:has(> .form-range-input:disabled) > :is(label, output) {
             color: var(--bs-fg-3);
+        }
+        .form-range > output {
+            float: inline-end;
+            font-variant-numeric: tabular-nums;
         }
         .cursor-picker {
             position: relative;
@@ -251,9 +255,10 @@
                                     <label for="hexagonFlatTop">Flat Top</label>
                                 </div>
                             </div>
-                            <div class="form-floating">
+                            <div class="form-range inputContainer">
                                 <label for="hexagonSize">Size (px)</label>
-                                <input type="number" class="form-control" id="hexagonSize" placeholder="Size (px)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="300">
+                                <output for="hexagonSize" aria-hidden="true">300</output>
+                                <input class="form-range-input" type="range" id="hexagonSize" min="0" max="1000" step="1" value="300" oninput="HexagonSizeChange();">
                             </div>
                             <div class="cursor-picker">
                                 <button type="button" class="form-control combobox-toggle" id="hexagonCursor" data-bs-toggle="combobox"
@@ -314,9 +319,10 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="form-floating">
+                            <div class="form-range inputContainer">
                                 <label for="hexagonBorderSize">Border Size (px)</label>
-                                <input type="number" class="form-control" id="hexagonBorderSize" placeholder="Size (px)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="10">
+                                <output for="hexagonBorderSize" aria-hidden="true">10</output>
+                                <input class="form-range-input" type="range" id="hexagonBorderSize" min="0" max="150" step="1" value="10" oninput="HexagonSizeChange();">
                             </div>
                             <div class="form-floating">
                                 <label for="hexagonBorderColor">Border Color</label>
@@ -324,9 +330,10 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="form-floating">
+                            <div class="form-range inputContainer">
                                 <label for="hexagonShadowBlur">Shadow Blur (px)</label>
-                                <input type="number" class="form-control" id="hexagonShadowBlur" placeholder="Blur (px)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="50">
+                                <output for="hexagonShadowBlur" aria-hidden="true">50</output>
+                                <input class="form-range-input" type="range" id="hexagonShadowBlur" min="0" max="200" step="1" value="50" oninput="HexagonSizeChange();">
                             </div>
                             <div class="form-floating">
                                 <label for="hexagonShadowColor">Shadow Color</label>
@@ -346,9 +353,10 @@
                                 <label for="hexagonTextColor">Text Color</label>
                                 <input type="color" class="form-control" id="hexagonTextColor" placeholder="Text Color" oninput="HexagonSizeChange();" value="#f47721">
                             </div>
-                            <div class="form-floating">
+                            <div class="form-range inputContainer">
                                 <label for="hexagonTextSize">Text Size (px)</label>
-                                <input type="number" class="form-control" id="hexagonTextSize" placeholder="Text Size (px)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="25">
+                                <output for="hexagonTextSize" aria-hidden="true">25</output>
+                                <input class="form-range-input" type="range" id="hexagonTextSize" min="0" max="150" step="1" value="25" oninput="HexagonSizeChange();">
                             </div>
                         </div>
                     </div>
@@ -366,13 +374,15 @@
                                     <label for="hexagonHoverFlatTop">Flat Top</label>
                                 </div>
                             </div>
-                            <div class="form-floating">
+                            <div class="form-range inputContainer">
                                 <label for="hexagonHoverSize">Size (px)</label>
-                                <input type="number" class="form-control" id="hexagonHoverSize" placeholder="Size (px)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="300">
+                                <output for="hexagonHoverSize" aria-hidden="true">300</output>
+                                <input class="form-range-input" type="range" id="hexagonHoverSize" min="0" max="1000" step="1" value="300" oninput="HexagonSizeChange();">
                             </div>
-                            <div class="form-floating">
+                            <div class="form-range inputContainer">
                                 <label for="hexagonHoverTransition">Transition (s)</label>
-                                <input type="number" class="form-control" id="hexagonHoverTransition" placeholder="Transition (s)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="0" step="0.1">
+                                <output for="hexagonHoverTransition" aria-hidden="true">0</output>
+                                <input class="form-range-input" type="range" id="hexagonHoverTransition" min="0" max="5" step="0.1" value="0" oninput="HexagonSizeChange();">
                             </div>
                         </div>
                         <div class="col">
@@ -386,9 +396,10 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="form-floating">
+                            <div class="form-range inputContainer">
                                 <label for="hexagonHoverBorderSize">Border Size (px)</label>
-                                <input type="number" class="form-control" id="hexagonHoverBorderSize" placeholder="Size (px)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="10">
+                                <output for="hexagonHoverBorderSize" aria-hidden="true">10</output>
+                                <input class="form-range-input" type="range" id="hexagonHoverBorderSize" min="0" max="150" step="1" value="10" oninput="HexagonSizeChange();">
                             </div>
                             <div class="form-floating">
                                 <label for="hexagonHoverBorderColor">Border Color</label>
@@ -396,9 +407,10 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="form-floating">
+                            <div class="form-range inputContainer">
                                 <label for="hexagonHoverShadowBlur">Shadow Blur (px)</label>
-                                <input type="number" class="form-control" id="hexagonHoverShadowBlur" placeholder="Blur (px)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="50">
+                                <output for="hexagonHoverShadowBlur" aria-hidden="true">50</output>
+                                <input class="form-range-input" type="range" id="hexagonHoverShadowBlur" min="0" max="200" step="1" value="50" oninput="HexagonSizeChange();">
                             </div>
                             <div class="form-floating">
                                 <label for="hexagonHoverShadowColor">Shadow Color</label>
@@ -414,13 +426,15 @@
                                 <label for="hexagonHoverTextColor">Text Color</label>
                                 <input type="color" class="form-control" id="hexagonHoverTextColor" placeholder="Text Color" oninput="HexagonSizeChange();" value="#f47721">
                             </div>
-                            <div class="form-floating">
+                            <div class="form-range inputContainer">
                                 <label for="hexagonHoverTextSize">Text Size (px)</label>
-                                <input type="number" class="form-control" id="hexagonHoverTextSize" placeholder="Text Size (px)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="25">
+                                <output for="hexagonHoverTextSize" aria-hidden="true">25</output>
+                                <input class="form-range-input" type="range" id="hexagonHoverTextSize" min="0" max="150" step="1" value="25" oninput="HexagonSizeChange();">
                             </div>
-                            <div class="form-floating">
+                            <div class="form-range inputContainer">
                                 <label for="hexagonHoverTextTransition">Transition (s)</label>
-                                <input type="number" class="form-control" id="hexagonHoverTextTransition" placeholder="Transition (s)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="0" step="0.1">
+                                <output for="hexagonHoverTextTransition" aria-hidden="true">0</output>
+                                <input class="form-range-input" type="range" id="hexagonHoverTextTransition" min="0" max="5" step="0.1" value="0" oninput="HexagonSizeChange();">
                             </div>
                         </div>
                     </div>
@@ -448,6 +462,16 @@
             const url = URL.parse(document.getElementById(inputId).value.trim());
             if (!url || !["http:", "https:"].includes(url.protocol)) return "none";
             return `url(${JSON.stringify(url.href)})`;
+        }
+
+        function getBorderSize(inputId, size) {
+            const slider = document.getElementById(inputId);
+            const max = String(Math.floor(size / 2));
+            if (slider.max !== max) {
+                slider.max = max;
+                slider.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            return slider.value;
         }
 
         function HexagonSizeChange(){
@@ -513,18 +537,15 @@
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             const HexagonCursor = cursorOptions.querySelector(".selected").dataset.bsValue;
             const HexagonColor = document.getElementById("hexagonColor").value; 
-            const HexagonSize = document.getElementById("hexagonSize").valueAsNumber || 0;
-            let HexagonBorderSize = document.getElementById("hexagonBorderSize").value;
-            if (HexagonBorderSize == "") HexagonBorderSize = 0;
+            const HexagonSize = document.getElementById("hexagonSize").valueAsNumber;
+            const HexagonBorderSize = getBorderSize("hexagonBorderSize", HexagonSize);
             const HexagonBorderColor = document.getElementById("hexagonBorderColor").value;
-            let HexagonShadowBlur = document.getElementById("hexagonShadowBlur").value;
-            if (HexagonShadowBlur == "") HexagonShadowBlur = 0;
+            const HexagonShadowBlur = document.getElementById("hexagonShadowBlur").value;
             const HexagonShadowColor = document.getElementById("hexagonShadowColor").value;
             const HexagonShadowColorArrayRGB = ColorHexToRGB(HexagonShadowColor);
             const HexagonShadowColorAlpha = document.getElementById("hexagonShadowColorAlpha").value;
             const HexagonSpanText = document.getElementById("hexagonText").value;
-            let HexagonSpanTextSize = document.getElementById("hexagonTextSize").value;
-            if (HexagonSpanTextSize == "") HexagonSpanTextSize = 0;
+            const HexagonSpanTextSize = document.getElementById("hexagonTextSize").value;
             const HexagonSpanColor = document.getElementById("hexagonTextColor").value;
             const {
                 width: HexagonWidth,
@@ -556,17 +577,14 @@
             // Hover
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             const HexagonHoverColor = document.getElementById("hexagonHoverColor").value; 
-            const HexagonHoverSize = document.getElementById("hexagonHoverSize").valueAsNumber || 0;
-            let HexagonHoverBorderSize = document.getElementById("hexagonHoverBorderSize").value;
-            if (HexagonHoverBorderSize == "") HexagonHoverBorderSize = 0;
+            const HexagonHoverSize = document.getElementById("hexagonHoverSize").valueAsNumber;
+            const HexagonHoverBorderSize = getBorderSize("hexagonHoverBorderSize", HexagonHoverSize);
             const HexagonHoverBorderColor = document.getElementById("hexagonHoverBorderColor").value;
-            let HexagonHoverShadowBlur = document.getElementById("hexagonHoverShadowBlur").value;
-            if (HexagonHoverShadowBlur == "") HexagonHoverShadowBlur = 0;
+            const HexagonHoverShadowBlur = document.getElementById("hexagonHoverShadowBlur").value;
             const HexagonHoverShadowColor = document.getElementById("hexagonHoverShadowColor").value;
             const HexagonHoverShadowColorArrayRGB = ColorHexToRGB(HexagonHoverShadowColor);
             const HexagonHoverShadowColorAlpha = document.getElementById("hexagonHoverShadowColorAlpha").value;
-            let HexagonHoverSpanTextSize = document.getElementById("hexagonHoverTextSize").value;
-            if (HexagonHoverSpanTextSize == "") HexagonHoverSpanTextSize = 0;
+            const HexagonHoverSpanTextSize = document.getElementById("hexagonHoverTextSize").value;
             const HexagonHoverSpanColor = document.getElementById("hexagonHoverTextColor").value;
             const {
                 width: HexagonHoverWidth,
@@ -576,10 +594,8 @@
                 textWidth: HexagonHoverShadowSpanWidth,
                 textHeight: HexagonHoverShadowSpanHeight,
             } = getGeometry(HexagonHoverSize, HexagonHoverBorderSize, hoverOrientation);
-            let HexagonHoverTransition = document.getElementById("hexagonHoverTransition").value;
-            if (HexagonHoverTransition == "") HexagonHoverTransition = 0;
-            let HexagonHoverSpanTransition = document.getElementById("hexagonHoverTextTransition").value;
-            if (HexagonHoverSpanTransition == "") HexagonHoverSpanTransition = 0;
+            const HexagonHoverTransition = document.getElementById("hexagonHoverTransition").value;
+            const HexagonHoverSpanTransition = document.getElementById("hexagonHoverTextTransition").value;
             if (HexagonHover) {
                 document.documentElement.style.setProperty("--hexagon-hover-width", `${HexagonHoverWidth}px`);
                 document.documentElement.style.setProperty("--hexagon-hover-height", `${HexagonHoverHeight}px`);
@@ -715,12 +731,16 @@
     <span>${escapedText}</span>
 </div>`;
 
+            for (const output of sliderOutputs) {
+                output.value = document.getElementById(output.htmlFor.value).value;
+            }
             for (const codeBlock of [layHexagonCodeHTML, layHexagonCodeCSS]) {
                 // The generated text replaced the previous highlighting.
                 delete codeBlock.dataset.highlighted;
                 window.hljs?.highlightElement(codeBlock);
             }
         }
+        const sliderOutputs = document.querySelectorAll(".form-range > output");
         const cursorPicker = document.getElementById("hexagonCursor");
         const cursorOptions = document.getElementById("hexagonCursorOptions");
         for (const option of cursorOptions.querySelectorAll("[data-bs-value]")) {
