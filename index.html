@@ -94,6 +94,27 @@
             content: "✓" / "";
             margin-inline-start: auto;
         }
+        .code-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+            margin-block-end: .25rem;
+        }
+        .copy-action {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .copy-action [role="status"] {
+            color: var(--bs-fg-2);
+            font-size: .8125rem;
+        }
+        @media (hover: hover) and (pointer: fine) and (not (any-pointer: coarse)) {
+            .code-panel:not(:hover, :focus-within, :has([role="status"]:not(:empty))) .copy-action button {
+                opacity: 0;
+            }
+        }
         #layHexagon > .col:first-child {
             padding-block-end: max(var(--hexagon-margin-top), var(--hexagon-hover-margin-top));
         }
@@ -233,14 +254,20 @@
     </header>
     <section class="row m-3">
         <section class="row mb-3">
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">General</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="hover-tab" data-bs-toggle="tab" data-bs-target="#hover" type="button" role="tab" aria-controls="hover" aria-selected="false">Hover</button>
-                </li>
-            </ul>
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 border-bottom">
+                <ul class="nav nav-tabs border-0" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">General</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="hover-tab" data-bs-toggle="tab" data-bs-target="#hover" type="button" role="tab" aria-controls="hover" aria-selected="false">Hover</button>
+                    </li>
+                </ul>
+                <div class="copy-action">
+                    <span role="status"></span>
+                    <button class="btn btn-sm btn-outline theme-secondary" type="button" id="copyDesignLink">Copy link</button>
+                </div>
+            </div>
             <div class="tab-content mt-3" id="myTabContent">
                 <div class="tab-pane active" id="general" role="tabpanel" aria-labelledby="general-tab">
                     <div class="row row-cols-1 sm:row-cols-2 md:row-cols-3 xl:row-cols-5 gy-3">
@@ -449,15 +476,104 @@
                 </div>
             </div>
             <div class="col">
-                <b>HTML:</b>
-                <pre><code class="language-html" id="layHexagonCodeHTML">...</code></pre>
-                <b>CSS:</b>
-                <pre><code class="language-css" id="layHexagonCodeCSS">...</code></pre>
+                <div class="code-panel">
+                    <div class="code-heading">
+                        <b>HTML:</b>
+                        <div class="copy-action">
+                            <span role="status"></span>
+                            <button class="btn btn-sm btn-outline theme-secondary" type="button" command="--copy-code" commandfor="layHexagonCodeHTML">Copy HTML</button>
+                        </div>
+                    </div>
+                    <pre><code class="language-html" id="layHexagonCodeHTML">...</code></pre>
+                </div>
+                <div class="code-panel">
+                    <div class="code-heading">
+                        <b>CSS:</b>
+                        <div class="copy-action">
+                            <span role="status"></span>
+                            <button class="btn btn-sm btn-outline theme-secondary" type="button" command="--copy-code" commandfor="layHexagonCodeCSS">Copy CSS</button>
+                        </div>
+                    </div>
+                    <pre><code class="language-css" id="layHexagonCodeCSS">...</code></pre>
+                </div>
             </div>
         </section>
     </section>
 
     <script>
+        function readSetting(input) {
+            return input.type === "checkbox" ? (input.checked ? "1" : "0") : input.value;
+        }
+
+        function restoreDesign() {
+            const params = new URLSearchParams(location.search);
+            for (const prefix of ["hexagon", "hexagonHover"]) {
+                const sizeSlider = document.getElementById(prefix + "Size");
+                document.getElementById(prefix + "BorderSize").max = Math.floor(sizeSlider.max / 2);
+            }
+            for (const { input, key } of designSettings) {
+                const value = params.get(key);
+                if (value === null) continue;
+                switch (input.type) {
+                    case "checkbox":
+                        if (value === "1" || value === "0") input.checked = value === "1";
+                        break;
+                    case "range":
+                        if (value.trim() && Number.isFinite(Number(value))) input.valueAsNumber = Number(value);
+                        break;
+                    case "color":
+                        if (/^#[\da-f]{6}$/i.test(value)) input.value = value;
+                        break;
+                    default:
+                        input.value = value;
+                }
+            }
+            const requestedCursor = params.get("cursor");
+            const option = Array.from(cursorOptions.querySelectorAll("[data-bs-value]"))
+                .find(item => item.dataset.bsValue === requestedCursor);
+            if (option) {
+                const selected = cursorOptions.querySelector(".selected");
+                selected.classList.remove("selected");
+                selected.setAttribute("aria-selected", "false");
+                option.classList.add("selected");
+                option.setAttribute("aria-selected", "true");
+                document.getElementById("hexagonCursorValue").textContent = requestedCursor;
+            }
+        }
+
+        function syncDesignURL() {
+            const url = new URL(location.href);
+            for (const { input, key, defaultValue } of designSettings) {
+                const value = readSetting(input);
+                if (value === defaultValue) url.searchParams.delete(key);
+                else url.searchParams.set(key, value);
+            }
+            const cursor = cursorOptions.querySelector(".selected").dataset.bsValue;
+            if (cursor === defaultCursor) url.searchParams.delete("cursor");
+            else url.searchParams.set("cursor", cursor);
+            if (url.href !== location.href) history.replaceState(history.state, "", url);
+            return url.href;
+        }
+
+        async function copyText(button, value, failureMessage) {
+            const status = button.previousElementSibling;
+            const previous = copyFeedback.get(button);
+            clearTimeout(previous?.timer);
+            const feedback = {};
+            copyFeedback.set(button, feedback);
+            status.textContent = "";
+            let message = "Copied";
+            try {
+                await navigator.clipboard.writeText(value);
+            } catch {
+                message = failureMessage;
+            }
+            if (copyFeedback.get(button) !== feedback) return;
+            feedback.message = message === previous?.message ? message + "\u00a0" : message;
+            status.textContent = feedback.message;
+            feedback.timer = setTimeout(() => status.textContent = "", 3000);
+        }
+
         function getBackgroundImage(inputId) {
             const url = URL.parse(document.getElementById(inputId).value.trim());
             if (!url || !["http:", "https:"].includes(url.protocol)) return "none";
@@ -739,10 +855,19 @@
                 delete codeBlock.dataset.highlighted;
                 window.hljs?.highlightElement(codeBlock);
             }
+            clearTimeout(shareURLTimer);
+            shareURLTimer = setTimeout(syncDesignURL, 300);
         }
         const sliderOutputs = document.querySelectorAll(".form-range > output");
         const cursorPicker = document.getElementById("hexagonCursor");
         const cursorOptions = document.getElementById("hexagonCursorOptions");
+        const defaultCursor = cursorOptions.querySelector(".selected").dataset.bsValue;
+        const designSettings = Array.from(document.querySelectorAll("#myTabContent input[id]"), input => {
+            const name = input.id.slice("hexagon".length);
+            return { input, key: name[0].toLowerCase() + name.slice(1), defaultValue: readSetting(input) };
+        });
+        const copyFeedback = new WeakMap();
+        let shareURLTimer;
         for (const option of cursorOptions.querySelectorAll("[data-bs-value]")) {
             option.style.cursor = option.dataset.bsValue;
         }
@@ -752,6 +877,16 @@
         cursorPicker.addEventListener("change.bs.combobox", () => {
             HexagonSizeChange();
         });
+        document.addEventListener("command", event => {
+            if (event.command === "--copy-code") {
+                copyText(event.source, event.target.textContent, "Copy failed");
+            }
+        }, true);
+        document.getElementById("copyDesignLink").addEventListener("click", event => {
+            clearTimeout(shareURLTimer);
+            copyText(event.currentTarget, syncDesignURL(), "Copy the address bar link");
+        });
+        restoreDesign();
         HexagonSizeChange();
     </script>
     
