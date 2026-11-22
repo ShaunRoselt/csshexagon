@@ -13,6 +13,7 @@
     <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/styles/default.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js"></script>
+    <script type="module" src="./download.js"></script>
 
     <style>
         :root {
@@ -282,14 +283,28 @@
                         <button class="nav-link" id="hover-tab" data-bs-toggle="tab" data-bs-target="#hover" type="button" role="tab" aria-controls="hover" aria-selected="false">Hover</button>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 ms-auto">
                     <button class="btn btn-sm btn-outline theme-secondary" type="button" id="resetDesign">Reset</button>
-                    <div class="copy-action">
-                        <span role="status"></span>
-                        <button class="btn btn-sm btn-outline theme-secondary" type="button" id="copyDesignLink">Copy link</button>
+                    <div class="position-relative">
+                        <button class="btn btn-sm btn-outline theme-secondary" type="button" id="downloadToggle" data-bs-toggle="menu" data-bs-placement="bottom-end" aria-haspopup="menu" aria-controls="downloadMenu" aria-expanded="false">
+                            Download <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="menu" id="downloadMenu" role="menu" aria-labelledby="downloadToggle">
+                            <button class="menu-item" type="button" role="menuitem" tabindex="-1" data-format="html">HTML</button>
+                            <button class="menu-item" type="button" role="menuitem" tabindex="-1" data-format="css">CSS</button>
+                            <button class="menu-item" type="button" role="menuitem" tabindex="-1" data-format="svg">SVG</button>
+                            <button class="menu-item" type="button" role="menuitem" tabindex="-1" data-format="png">PNG</button>
+                            <button class="menu-item" type="button" role="menuitem" tabindex="-1" data-format="webp">WebP</button>
+                            <button class="menu-item" type="button" role="menuitem" tabindex="-1" data-format="gif">GIF</button>
+                            <button class="menu-item" type="button" role="menuitem" tabindex="-1" data-format="psd">PSD</button>
+                            <button class="menu-item" type="button" role="menuitem" tabindex="-1" data-format="pdf">PDF</button>
+                        </div>
                     </div>
+                    <button class="btn btn-sm btn-outline theme-secondary" type="button" id="copyDesignLink">Copy link</button>
                 </div>
             </div>
+            <span class="small" id="downloadStatus" role="status"></span>
+            <span class="small" id="copyLinkStatus" role="status"></span>
             <div class="tab-content mt-3" id="myTabContent">
                 <div class="tab-pane active" id="general" role="tabpanel" aria-labelledby="general-tab">
                     <div class="row row-cols-1 sm:row-cols-2 md:row-cols-3 xl:row-cols-5 gy-3">
@@ -580,8 +595,7 @@
             return url.href;
         }
 
-        async function copyText(button, value, failureMessage) {
-            const status = button.previousElementSibling;
+        async function copyText(button, value, failureMessage, status = button.previousElementSibling) {
             const previous = copyFeedback.get(button);
             clearTimeout(previous?.timer);
             const feedback = {};
@@ -599,10 +613,14 @@
             feedback.timer = setTimeout(() => status.textContent = "", 3000);
         }
 
-        function getBackgroundImage(inputId) {
+        function getImageURL(inputId) {
             const url = URL.parse(document.getElementById(inputId).value.trim());
-            if (!url || !["http:", "https:"].includes(url.protocol)) return "none";
-            return `url(${JSON.stringify(url.href)})`;
+            return url && ["http:", "https:"].includes(url.protocol) ? url.href : "";
+        }
+
+        function getBackgroundImage(inputId) {
+            const url = getImageURL(inputId);
+            return url ? `url(${JSON.stringify(url)})` : "none";
         }
 
         function getBorderSize(inputId, size) {
@@ -938,7 +956,7 @@
             }
         }, true);
         document.getElementById("copyDesignLink").addEventListener("click", event => {
-            copyText(event.currentTarget, syncDesignURL(), "Copy the address bar link");
+            copyText(event.currentTarget, syncDesignURL(), "Copy the address bar link", document.getElementById("copyLinkStatus"));
         });
         document.getElementById("resetDesign").addEventListener("click", () => {
             restoreDesign(new URLSearchParams());
