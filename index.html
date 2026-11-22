@@ -31,9 +31,7 @@
             --hexagon-shadow-blur: 0px;
             --hexagon-span-color: #f47721;
             --hexagon-span-text-size: 25px;
-            --hexagon-span-top: 5.773502691896257px;
             --hexagon-span-width: 280px;
-            --hexagon-span-height: 161.6581px;
             
             --hexagon-hover-width: 210px;
             --hexagon-hover-height: 121.24px;
@@ -45,9 +43,7 @@
             --hexagon-hover-shadow-blur: 0px;
             --hexagon-hover-span-color: #f47721;
             --hexagon-hover-span-text-size: 25px;
-            --hexagon-hover-span-top: 5.773502691896257px;
             --hexagon-hover-span-width: 280px;
-            --hexagon-hover-span-height: 161.6581px;
             --hexagon-hover-span-transition: 0s;
             --hexagon-hover-transition: 0s;
         }
@@ -148,6 +144,7 @@
     margin: var(--hexagon-margin-top) auto 0 auto;
     filter: drop-shadow(0 0 calc(var(--hexagon-shadow-blur) / 2) var(--hexagon-shadow-color));
     display: grid;
+    grid-template: 100% / 100%;
     pointer-events: none;
     transition: var(--hexagon-hover-transition);
 }
@@ -165,6 +162,7 @@
     inset: calc(-1 * var(--hexagon-margin-top)) 0;
     pointer-events: auto;
     background-color: var(--hexagon-border-color);
+    background-image: var(--hexagon-border-gradient);
     opacity: sign(var(--hexagon-border-width));
 }
 
@@ -174,20 +172,21 @@
     background: var(--hexagon-background-image) center / cover no-repeat var(--hexagon-color);
 }
 
-.hexagon span {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    align-self: start;
-    justify-self: center;
+.hexagon > span {
+    place-self: center;
     font-size: var(--hexagon-span-text-size);
     color: var(--hexagon-span-color);
-    margin-top: var(--hexagon-span-top);
-    width: var(--hexagon-span-width);
-    height: var(--hexagon-span-height);
+    max-width: var(--hexagon-span-width);
     z-index: 1;
     pointer-events: auto;
     transition: var(--hexagon-hover-span-transition);
+}
+
+    </style>
+    <style id="HexagonTextGradientCodeCSS">
+.hexagon > span {
+    background-image: var(--hexagon-text-gradient);
+    background-clip: text;
 }
     </style>
     <style id="HexagonHoverCodeCSS">
@@ -205,6 +204,7 @@
 .hexagon:hover::before {
     inset: calc(-1 * var(--hexagon-hover-margin-top)) 0;
     background-color: var(--hexagon-hover-border-color);
+    background-image: var(--hexagon-hover-border-gradient);
     opacity: sign(var(--hexagon-hover-border-width));
 }
 
@@ -215,7 +215,7 @@
     background-image: var(--hexagon-hover-background-image);
 }
 
-.hexagon span::before {
+.hexagon > span::before {
     content: "";
     position: absolute;
     z-index: -1;
@@ -227,16 +227,57 @@
     transition: top var(--hexagon-hover-transition);
 }
 
-.hexagon:hover span::before {
+.hexagon:hover > span::before {
     top: calc(-1 * var(--hexagon-hover-margin-top));
 }
 
-.hexagon:hover span {
+.hexagon:hover > span {
     font-size: var(--hexagon-hover-span-text-size);
     color: var(--hexagon-hover-span-color);
-    margin-top: var(--hexagon-hover-span-top);
-    width: var(--hexagon-hover-span-width);
-    height: var(--hexagon-hover-span-height);
+    max-width: var(--hexagon-hover-span-width);
+}
+
+    </style>
+    <style id="HexagonHoverTextGradientCodeCSS">
+.hexagon:hover > span {
+    background-image: var(--hexagon-hover-text-gradient);
+}
+    </style>
+    <style id="HexagonShadowGradientCodeCSS">
+.hexagon:has(> .hexagon-shadow:not([hidden])) {
+    filter: none;
+    isolation: isolate;
+}
+
+.hexagon-shadow {
+    position: absolute;
+    inset: calc(-1 * var(--hexagon-margin-top)) 0;
+    z-index: -1;
+    filter: blur(calc(var(--hexagon-shadow-blur) / 2));
+    opacity: var(--hexagon-shadow-opacity);
+    pointer-events: none;
+    transition: var(--hexagon-hover-transition);
+}
+
+.hexagon-shadow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    clip-path: var(--hexagon-outline);
+    background: var(--hexagon-shadow-paint);
+    transition: background-color var(--hexagon-hover-transition);
+}
+    </style>
+    <style id="HexagonHoverShadowGradientCodeCSS">
+.hexagon:hover > .hexagon-shadow {
+    inset: calc(-1 * var(--hexagon-hover-margin-top)) 0;
+    filter: blur(calc(var(--hexagon-hover-shadow-blur) / 2));
+    opacity: var(--hexagon-hover-shadow-opacity);
+}
+
+.hexagon:hover > .hexagon-shadow::before {
+    clip-path: var(--hexagon-hover-outline);
+    background: var(--hexagon-hover-shadow-paint);
 }
     </style>
 </head>
@@ -373,9 +414,26 @@
                             </div>
                         </div>
                         <div class="col">
+                            <div class="inputContainer">
+                                <div class="form-field">
+                                    <input class="check gradient-toggle" type="checkbox" id="hexagonGradient" aria-controls="hexagonGradientOptions" onchange="HexagonSizeChange();">
+                                    <label for="hexagonGradient">Gradient Fill</label>
+                                </div>
+                            </div>
                             <div class="form-floating">
-                                <label for="hexagonColor">Solid Color</label>
+                                <label for="hexagonColor" id="hexagonColorLabel">Solid Color</label>
                                 <input type="color" class="form-control" id="hexagonColor" placeholder="Solid Color" oninput="HexagonSizeChange();" value="#2b2f38">
+                            </div>
+                            <div id="hexagonGradientOptions" hidden>
+                                <div class="form-floating">
+                                    <label for="hexagonGradientEndColor">End Color</label>
+                                    <input type="color" class="form-control" id="hexagonGradientEndColor" placeholder="End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                </div>
+                                <div class="form-range inputContainer">
+                                    <label for="hexagonGradientAngle">Angle (°)</label>
+                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Angle (°)" value="90">
+                                    <input class="form-range-input" type="range" id="hexagonGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                </div>
                             </div>
                             <div class="form-floating">
                                 <label for="hexagonImageURL">Image URL</label>
@@ -388,9 +446,26 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Border Size (px)" value="10">
                                 <input class="form-range-input" type="range" id="hexagonBorderSize" min="0" max="150" step="1" value="10" oninput="HexagonSizeChange();">
                             </div>
+                            <div class="inputContainer">
+                                <div class="form-field">
+                                    <input class="check gradient-toggle" type="checkbox" id="hexagonBorderGradient" aria-controls="hexagonBorderGradientOptions" onchange="HexagonSizeChange();">
+                                    <label for="hexagonBorderGradient">Gradient Border</label>
+                                </div>
+                            </div>
                             <div class="form-floating">
-                                <label for="hexagonBorderColor">Border Color</label>
+                                <label for="hexagonBorderColor" id="hexagonBorderColorLabel">Border Color</label>
                                 <input type="color" class="form-control" id="hexagonBorderColor" placeholder="Border Color" oninput="HexagonSizeChange();" value="#f47721">
+                            </div>
+                            <div id="hexagonBorderGradientOptions" hidden>
+                                <div class="form-floating">
+                                    <label for="hexagonBorderGradientEndColor">Border End Color</label>
+                                    <input type="color" class="form-control" id="hexagonBorderGradientEndColor" placeholder="Border End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                </div>
+                                <div class="form-range inputContainer">
+                                    <label for="hexagonBorderGradientAngle">Border Angle (°)</label>
+                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Border Angle (°)" value="90">
+                                    <input class="form-range-input" type="range" id="hexagonBorderGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                </div>
                             </div>
                         </div>
                         <div class="col">
@@ -399,9 +474,26 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Shadow Blur (px)" value="50">
                                 <input class="form-range-input" type="range" id="hexagonShadowBlur" min="0" max="200" step="1" value="50" oninput="HexagonSizeChange();">
                             </div>
+                            <div class="inputContainer">
+                                <div class="form-field">
+                                    <input class="check gradient-toggle" type="checkbox" id="hexagonShadowGradient" aria-controls="hexagonShadowGradientOptions" onchange="HexagonSizeChange();">
+                                    <label for="hexagonShadowGradient">Gradient Shadow</label>
+                                </div>
+                            </div>
                             <div class="form-floating">
-                                <label for="hexagonShadowColor">Shadow Color</label>
+                                <label for="hexagonShadowColor" id="hexagonShadowColorLabel">Shadow Color</label>
                                 <input type="color" class="form-control" id="hexagonShadowColor" placeholder="Shadow Color" oninput="HexagonSizeChange();" value="#00FFFF">
+                            </div>
+                            <div id="hexagonShadowGradientOptions" hidden>
+                                <div class="form-floating">
+                                    <label for="hexagonShadowGradientEndColor">Shadow End Color</label>
+                                    <input type="color" class="form-control" id="hexagonShadowGradientEndColor" placeholder="Shadow End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                </div>
+                                <div class="form-range inputContainer">
+                                    <label for="hexagonShadowGradientAngle">Shadow Angle (°)</label>
+                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Shadow Angle (°)" value="90">
+                                    <input class="form-range-input" type="range" id="hexagonShadowGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                </div>
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonShadowColorAlpha">Shadow Alpha</label>
@@ -414,9 +506,26 @@
                                 <label for="hexagonText">Text</label>
                                 <input type="text" class="form-control" id="hexagonText" placeholder="Text" oninput="HexagonSizeChange();" value="I am text!">
                             </div>
+                            <div class="inputContainer">
+                                <div class="form-field">
+                                    <input class="check gradient-toggle" type="checkbox" id="hexagonTextGradient" aria-controls="hexagonTextGradientOptions" onchange="HexagonSizeChange();">
+                                    <label for="hexagonTextGradient">Gradient Text</label>
+                                </div>
+                            </div>
                             <div class="form-floating">
-                                <label for="hexagonTextColor">Text Color</label>
+                                <label for="hexagonTextColor" id="hexagonTextColorLabel">Text Color</label>
                                 <input type="color" class="form-control" id="hexagonTextColor" placeholder="Text Color" oninput="HexagonSizeChange();" value="#f47721">
+                            </div>
+                            <div id="hexagonTextGradientOptions" hidden>
+                                <div class="form-floating">
+                                    <label for="hexagonTextGradientEndColor">Text End Color</label>
+                                    <input type="color" class="form-control" id="hexagonTextGradientEndColor" placeholder="Text End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                </div>
+                                <div class="form-range inputContainer">
+                                    <label for="hexagonTextGradientAngle">Text Angle (°)</label>
+                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Text Angle (°)" value="90">
+                                    <input class="form-range-input" type="range" id="hexagonTextGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                </div>
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonTextSize">Text Size (px)</label>
@@ -451,9 +560,26 @@
                             </div>
                         </div>
                         <div class="col">
+                            <div class="inputContainer">
+                                <div class="form-field">
+                                    <input class="check gradient-toggle" type="checkbox" id="hexagonHoverGradient" aria-controls="hexagonHoverGradientOptions" onchange="HexagonSizeChange();">
+                                    <label for="hexagonHoverGradient">Gradient Fill</label>
+                                </div>
+                            </div>
                             <div class="form-floating">
-                                <label for="hexagonHoverColor">Solid Color</label>
+                                <label for="hexagonHoverColor" id="hexagonHoverColorLabel">Solid Color</label>
                                 <input type="color" class="form-control" id="hexagonHoverColor" placeholder="Solid Color" oninput="HexagonSizeChange();" value="#2b2f38">
+                            </div>
+                            <div id="hexagonHoverGradientOptions" hidden>
+                                <div class="form-floating">
+                                    <label for="hexagonHoverGradientEndColor">End Color</label>
+                                    <input type="color" class="form-control" id="hexagonHoverGradientEndColor" placeholder="End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                </div>
+                                <div class="form-range inputContainer">
+                                    <label for="hexagonHoverGradientAngle">Angle (°)</label>
+                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Angle (°)" value="90">
+                                    <input class="form-range-input" type="range" id="hexagonHoverGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                </div>
                             </div>
                             <div class="form-floating">
                                 <label for="hexagonHoverImageURL">Image URL</label>
@@ -466,9 +592,26 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Border Size (px)" value="10">
                                 <input class="form-range-input" type="range" id="hexagonHoverBorderSize" min="0" max="150" step="1" value="10" oninput="HexagonSizeChange();">
                             </div>
+                            <div class="inputContainer">
+                                <div class="form-field">
+                                    <input class="check gradient-toggle" type="checkbox" id="hexagonHoverBorderGradient" aria-controls="hexagonHoverBorderGradientOptions" onchange="HexagonSizeChange();">
+                                    <label for="hexagonHoverBorderGradient">Gradient Border</label>
+                                </div>
+                            </div>
                             <div class="form-floating">
-                                <label for="hexagonHoverBorderColor">Border Color</label>
+                                <label for="hexagonHoverBorderColor" id="hexagonHoverBorderColorLabel">Border Color</label>
                                 <input type="color" class="form-control" id="hexagonHoverBorderColor" placeholder="Border Color" oninput="HexagonSizeChange();" value="#f47721">
+                            </div>
+                            <div id="hexagonHoverBorderGradientOptions" hidden>
+                                <div class="form-floating">
+                                    <label for="hexagonHoverBorderGradientEndColor">Border End Color</label>
+                                    <input type="color" class="form-control" id="hexagonHoverBorderGradientEndColor" placeholder="Border End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                </div>
+                                <div class="form-range inputContainer">
+                                    <label for="hexagonHoverBorderGradientAngle">Border Angle (°)</label>
+                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Border Angle (°)" value="90">
+                                    <input class="form-range-input" type="range" id="hexagonHoverBorderGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                </div>
                             </div>
                         </div>
                         <div class="col">
@@ -477,9 +620,26 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Shadow Blur (px)" value="50">
                                 <input class="form-range-input" type="range" id="hexagonHoverShadowBlur" min="0" max="200" step="1" value="50" oninput="HexagonSizeChange();">
                             </div>
+                            <div class="inputContainer">
+                                <div class="form-field">
+                                    <input class="check gradient-toggle" type="checkbox" id="hexagonHoverShadowGradient" aria-controls="hexagonHoverShadowGradientOptions" onchange="HexagonSizeChange();">
+                                    <label for="hexagonHoverShadowGradient">Gradient Shadow</label>
+                                </div>
+                            </div>
                             <div class="form-floating">
-                                <label for="hexagonHoverShadowColor">Shadow Color</label>
+                                <label for="hexagonHoverShadowColor" id="hexagonHoverShadowColorLabel">Shadow Color</label>
                                 <input type="color" class="form-control" id="hexagonHoverShadowColor" placeholder="Shadow Color" oninput="HexagonSizeChange();" value="#00FFFF">
+                            </div>
+                            <div id="hexagonHoverShadowGradientOptions" hidden>
+                                <div class="form-floating">
+                                    <label for="hexagonHoverShadowGradientEndColor">Shadow End Color</label>
+                                    <input type="color" class="form-control" id="hexagonHoverShadowGradientEndColor" placeholder="Shadow End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                </div>
+                                <div class="form-range inputContainer">
+                                    <label for="hexagonHoverShadowGradientAngle">Shadow Angle (°)</label>
+                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Shadow Angle (°)" value="90">
+                                    <input class="form-range-input" type="range" id="hexagonHoverShadowGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                </div>
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonHoverShadowColorAlpha">Shadow Alpha</label>
@@ -488,9 +648,26 @@
                             </div>
                         </div>
                         <div class="col">
+                            <div class="inputContainer">
+                                <div class="form-field">
+                                    <input class="check gradient-toggle" type="checkbox" id="hexagonHoverTextGradient" aria-controls="hexagonHoverTextGradientOptions" onchange="HexagonSizeChange();">
+                                    <label for="hexagonHoverTextGradient">Gradient Text</label>
+                                </div>
+                            </div>
                             <div class="form-floating">
-                                <label for="hexagonHoverTextColor">Text Color</label>
+                                <label for="hexagonHoverTextColor" id="hexagonHoverTextColorLabel">Text Color</label>
                                 <input type="color" class="form-control" id="hexagonHoverTextColor" placeholder="Text Color" oninput="HexagonSizeChange();" value="#f47721">
+                            </div>
+                            <div id="hexagonHoverTextGradientOptions" hidden>
+                                <div class="form-floating">
+                                    <label for="hexagonHoverTextGradientEndColor">Text End Color</label>
+                                    <input type="color" class="form-control" id="hexagonHoverTextGradientEndColor" placeholder="Text End Color" oninput="HexagonSizeChange();" value="#007bff">
+                                </div>
+                                <div class="form-range inputContainer">
+                                    <label for="hexagonHoverTextGradientAngle">Text Angle (°)</label>
+                                    <input class="range-value" type="number" inputmode="numeric" aria-label="Exact Text Angle (°)" value="90">
+                                    <input class="form-range-input" type="range" id="hexagonHoverTextGradientAngle" min="0" max="360" step="1" value="90" oninput="HexagonSizeChange();">
+                                </div>
                             </div>
                             <div class="form-range inputContainer">
                                 <label for="hexagonHoverTextSize">Text Size (px)</label>
@@ -511,6 +688,7 @@
         <section class="row row-cols-1 md:row-cols-2 gy-3 mb-3" id="layHexagon">
             <div class="col">
                 <div class="hexagon">
+                    <div class="hexagon-shadow" id="layHexagonShadow" aria-hidden="true" hidden></div>
                     <span id="layHexagonText"></span>
                 </div>
             </div>
@@ -618,9 +796,28 @@
             return url && ["http:", "https:"].includes(url.protocol) ? url.href : "";
         }
 
-        function getBackgroundImage(inputId) {
-            const url = getImageURL(inputId);
-            return url ? `url(${JSON.stringify(url)})` : "none";
+        function getGradient(prefix) {
+            if (!document.getElementById(prefix + "Gradient").checked) return null;
+            return {
+                angle: document.getElementById(prefix + "GradientAngle").valueAsNumber,
+                start: document.getElementById(prefix + "Color").value,
+                end: document.getElementById(prefix + "GradientEndColor").value,
+            };
+        }
+
+        function gradientCSS(gradient) {
+            return gradient ? `linear-gradient(${gradient.angle}deg in srgb, ${gradient.start}, ${gradient.end})` : "none";
+        }
+
+        function getBackgroundImage(prefix) {
+            const url = getImageURL(prefix + "ImageURL");
+            const gradient = getGradient(prefix);
+            const layers = [];
+            if (url) layers.push(`url(${JSON.stringify(url)})`);
+            if (gradient) {
+                layers.push(gradientCSS(gradient));
+            }
+            return layers.join(", ") || "none";
         }
 
         function getBorderSize(inputId, size) {
@@ -646,9 +843,18 @@
                 return ArrayRGB;
             }
             const HexagonHover = document.getElementById("hexagonHover").checked; 
-            document.querySelectorAll("#hover .form-control, #hover .form-range-input, #hexagonHoverFlatTop").forEach((element) => {
+            document.querySelectorAll("#hover .form-control, #hover .form-range-input, #hexagonHoverFlatTop, #hover .gradient-toggle").forEach((element) => {
                 element.disabled = !HexagonHover;
             });
+            for (const prefix of ["hexagon", "hexagonHover"]) {
+                for (const part of ["", "Border", "Shadow", "Text"]) {
+                    const name = prefix + part;
+                    const enabled = document.getElementById(name + "Gradient").checked;
+                    document.getElementById(name + "GradientOptions").hidden = !enabled;
+                    const label = enabled ? (part ? part + " Start Color" : "Start Color") : (part ? part + " Color" : "Solid Color");
+                    document.getElementById(name + "ColorLabel").textContent = label;
+                }
+            }
             const sqrt3 = Math.sqrt(3);
             function getOrientation(flatTop) {
                 const angledBorderScale = 2 / sqrt3;
@@ -662,18 +868,15 @@
                 };
             }
 
-            function getGeometry(size, border, { flatTop, borderScaleX, borderScaleY }) {
+            function getGeometry(size, border, { flatTop, borderScaleX }) {
                 const width = flatTop ? size * 2 / sqrt3 : size;
                 const height = flatTop ? size : size / sqrt3;
                 const innerWidth = width - 2 * border * borderScaleX;
-                const textHeight = flatTop ? (height - 2 * border) / 2 : height - border * borderScaleY;
                 return {
                     width,
                     height,
                     marginTop: flatTop ? 0 : height / 2,
-                    textTop: (height - textHeight) / 2,
                     textWidth: flatTop ? innerWidth * 0.75 : innerWidth,
-                    textHeight: textHeight.toFixed(4),
                 };
             }
 
@@ -685,8 +888,32 @@
             document.documentElement.style.setProperty("--hexagon-hover-outline", hoverOrientation.outline);
             document.documentElement.style.setProperty("--hexagon-hover-border-scale-x", hoverOrientation.borderScaleX);
             document.documentElement.style.setProperty("--hexagon-hover-border-scale-y", hoverOrientation.borderScaleY);
-            const backgroundImage = getBackgroundImage("hexagonImageURL");
-            const hoverBackgroundImage = HexagonHover ? getBackgroundImage("hexagonHoverImageURL") : backgroundImage;
+            const backgroundImage = getBackgroundImage("hexagon");
+            const hoverBackgroundImage = HexagonHover ? getBackgroundImage("hexagonHover") : backgroundImage;
+
+            const generalTextGradient = getGradient("hexagonText");
+            const hoverTextGradient = HexagonHover ? getGradient("hexagonHoverText") : generalTextGradient;
+            const generalShadowGradient = getGradient("hexagonShadow");
+            const hoverShadowGradient = HexagonHover ? getGradient("hexagonHoverShadow") : generalShadowGradient;
+            const useShadowGradient = generalShadowGradient || hoverShadowGradient;
+            document.getElementById("layHexagonShadow").hidden = !useShadowGradient;
+            const gradientProperties = [];
+            for (const [cssPrefix, inputPrefix, textGradient, shadowGradient] of [
+                ["--hexagon-", "hexagon", generalTextGradient, generalShadowGradient],
+                ["--hexagon-hover-", HexagonHover ? "hexagonHover" : "hexagon", hoverTextGradient, hoverShadowGradient],
+            ]) {
+                gradientProperties.push(
+                    [cssPrefix + "border-gradient", gradientCSS(getGradient(inputPrefix + "Border"))],
+                    [cssPrefix + "text-gradient", gradientCSS(textGradient)],
+                );
+                if (useShadowGradient) {
+                    gradientProperties.push(
+                        [cssPrefix + "shadow-paint", shadowGradient ? gradientCSS(shadowGradient) : document.getElementById(inputPrefix + "ShadowColor").value],
+                        [cssPrefix + "shadow-opacity", document.getElementById(inputPrefix + "ShadowColorAlpha").value],
+                    );
+                }
+            }
+            for (const [name, value] of gradientProperties) document.documentElement.style.setProperty(name, value);
 
             document.documentElement.style.setProperty("--hexagon-background-image", backgroundImage);
             document.documentElement.style.setProperty("--hexagon-hover-background-image", hoverBackgroundImage);
@@ -705,14 +932,12 @@
             const HexagonShadowColorAlpha = document.getElementById("hexagonShadowColorAlpha").value;
             const HexagonSpanText = document.getElementById("hexagonText").value;
             const HexagonSpanTextSize = document.getElementById("hexagonTextSize").value;
-            const HexagonSpanColor = document.getElementById("hexagonTextColor").value;
+            const HexagonSpanColor = generalTextGradient ? "transparent" : document.getElementById("hexagonTextColor").value;
             const {
                 width: HexagonWidth,
                 height: HexagonHeight,
                 marginTop: HexagonMarginTop,
-                textTop: HexagonShadowSpanTop,
                 textWidth: HexagonShadowSpanWidth,
-                textHeight: HexagonShadowSpanHeight,
             } = getGeometry(HexagonSize, HexagonBorderSize, orientation);
             const HexagonVariablesCSS = document.getElementById("hexagonVariablesCSS").checked;
             document.documentElement.style.setProperty("--hexagon-cursor", `${HexagonCursor}`);
@@ -727,9 +952,7 @@
             document.getElementById("layHexagonText").textContent = HexagonSpanText;
             document.documentElement.style.setProperty("--hexagon-span-text-size", `${HexagonSpanTextSize}px`);
             document.documentElement.style.setProperty("--hexagon-span-color", `${HexagonSpanColor}`);
-            document.documentElement.style.setProperty("--hexagon-span-top", `${HexagonShadowSpanTop}px`);
             document.documentElement.style.setProperty("--hexagon-span-width", `${HexagonShadowSpanWidth}px`);
-            document.documentElement.style.setProperty("--hexagon-span-height", `${HexagonShadowSpanHeight}px`);
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -744,14 +967,12 @@
             const HexagonHoverShadowColorArrayRGB = ColorHexToRGB(HexagonHoverShadowColor);
             const HexagonHoverShadowColorAlpha = document.getElementById("hexagonHoverShadowColorAlpha").value;
             const HexagonHoverSpanTextSize = document.getElementById("hexagonHoverTextSize").value;
-            const HexagonHoverSpanColor = document.getElementById("hexagonHoverTextColor").value;
+            const HexagonHoverSpanColor = hoverTextGradient ? "transparent" : document.getElementById("hexagonHoverTextColor").value;
             const {
                 width: HexagonHoverWidth,
                 height: HexagonHoverHeight,
                 marginTop: HexagonHoverMarginTop,
-                textTop: HexagonHoverShadowSpanTop,
                 textWidth: HexagonHoverShadowSpanWidth,
-                textHeight: HexagonHoverShadowSpanHeight,
             } = getGeometry(HexagonHoverSize, HexagonHoverBorderSize, hoverOrientation);
             const HexagonHoverTransition = document.getElementById("hexagonHoverTransition").value;
             const HexagonHoverSpanTransition = document.getElementById("hexagonHoverTextTransition").value;
@@ -766,9 +987,7 @@
                 document.documentElement.style.setProperty("--hexagon-hover-shadow-color", `rgba(${HexagonHoverShadowColorArrayRGB[0]},${HexagonHoverShadowColorArrayRGB[1]},${HexagonHoverShadowColorArrayRGB[2]},${HexagonHoverShadowColorAlpha})`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-text-size", `${HexagonHoverSpanTextSize}px`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-color", `${HexagonHoverSpanColor}`);
-                document.documentElement.style.setProperty("--hexagon-hover-span-top", `${HexagonHoverShadowSpanTop}px`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-width", `${HexagonHoverShadowSpanWidth}px`);
-                document.documentElement.style.setProperty("--hexagon-hover-span-height", `${HexagonHoverShadowSpanHeight}px`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-transition", `${HexagonHoverSpanTransition}s`);
                 document.documentElement.style.setProperty("--hexagon-hover-transition", `${HexagonHoverTransition}s`);
             } else {
@@ -782,9 +1001,7 @@
                 document.documentElement.style.setProperty("--hexagon-hover-shadow-color", `rgba(${HexagonShadowColorArrayRGB[0]},${HexagonShadowColorArrayRGB[1]},${HexagonShadowColorArrayRGB[2]},${HexagonShadowColorAlpha})`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-text-size", `${HexagonSpanTextSize}px`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-color", `${HexagonSpanColor}`);
-                document.documentElement.style.setProperty("--hexagon-hover-span-top", `${HexagonShadowSpanTop}px`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-width", `${HexagonShadowSpanWidth}px`);
-                document.documentElement.style.setProperty("--hexagon-hover-span-height", `${HexagonShadowSpanHeight}px`);
                 document.documentElement.style.setProperty("--hexagon-hover-span-transition", `0s`);
                 document.documentElement.style.setProperty("--hexagon-hover-transition", `0s`);
             }
@@ -793,6 +1010,21 @@
             let hexagonRules = document.getElementById("HexagonCodeCSS").textContent.trim();
             if (HexagonHover) {
                 hexagonRules += "\n\n" + document.getElementById("HexagonHoverCodeCSS").textContent.trim();
+            }
+
+            const useTextGradient = generalTextGradient || hoverTextGradient;
+            if (useTextGradient) {
+                hexagonRules += "\n\n" + document.getElementById("HexagonTextGradientCodeCSS").textContent.trim();
+                if (HexagonHover) {
+                    hexagonRules += "\n\n" + document.getElementById("HexagonHoverTextGradientCodeCSS").textContent.trim();
+                }
+            }
+
+            if (useShadowGradient) {
+                hexagonRules += "\n\n" + document.getElementById("HexagonShadowGradientCodeCSS").textContent.trim();
+                if (HexagonHover) {
+                    hexagonRules += "\n\n" + document.getElementById("HexagonHoverShadowGradientCodeCSS").textContent.trim();
+                }
             }
 
             const layHexagonCodeCSS = document.getElementById("layHexagonCodeCSS");
@@ -813,9 +1045,7 @@
     --hexagon-shadow-blur: ${HexagonShadowBlur}px;
     --hexagon-span-color: ${HexagonSpanColor};
     --hexagon-span-text-size: ${HexagonSpanTextSize}px;
-    --hexagon-span-top: ${HexagonShadowSpanTop}px;
     --hexagon-span-width: ${HexagonShadowSpanWidth}px;
-    --hexagon-span-height: ${HexagonShadowSpanHeight}px;
     --hexagon-hover-span-transition: ${HexagonHover ? HexagonHoverSpanTransition : 0}s;
     --hexagon-hover-transition: ${HexagonHover ? HexagonHoverTransition : 0}s;
     --hexagon-background-image: ${backgroundImage};
@@ -836,10 +1066,13 @@
     --hexagon-hover-shadow-blur: ${HexagonHoverShadowBlur}px;
     --hexagon-hover-span-color: ${HexagonHoverSpanColor};
     --hexagon-hover-span-text-size: ${HexagonHoverSpanTextSize}px;
-    --hexagon-hover-span-top: ${HexagonHoverShadowSpanTop}px;
     --hexagon-hover-span-width: ${HexagonHoverShadowSpanWidth}px;
-    --hexagon-hover-span-height: ${HexagonHoverShadowSpanHeight}px;
 `;
+                }
+                for (const [name, value] of gradientProperties) {
+                    if ((HexagonHover || !name.startsWith("--hexagon-hover-")) && (useTextGradient || !name.endsWith("-text-gradient"))) {
+                        layHexagonCodeCSS.textContent += `    ${name}: ${value};\n`;
+                    }
                 }
                 layHexagonCodeCSS.textContent += `}\n\n${hexagonRules}`;
             } else {
@@ -861,9 +1094,7 @@
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-shadow-blur)",`${HexagonShadowBlur}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-span-color)",`${HexagonSpanColor}`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-span-text-size)",`${HexagonSpanTextSize}px`);
-                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-span-top)",`${HexagonShadowSpanTop}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-span-width)",`${HexagonShadowSpanWidth}px`);
-                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-span-height)",`${HexagonShadowSpanHeight}px`);     
 
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-width)",`${HexagonHoverWidth}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-height)",`${HexagonHoverHeight}px`);
@@ -875,18 +1106,19 @@
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-shadow-blur)",`${HexagonHoverShadowBlur}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-color)",`${HexagonHoverSpanColor}`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-text-size)",`${HexagonHoverSpanTextSize}px`);
-                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-top)",`${HexagonHoverShadowSpanTop}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-width)",`${HexagonHoverShadowSpanWidth}px`);
-                HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-height)",`${HexagonHoverShadowSpanHeight}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-span-transition)", `${HexagonHover ? HexagonHoverSpanTransition : 0}s`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-hover-transition)", `${HexagonHover ? HexagonHoverTransition : 0}s`);
+                for (const [name, value] of gradientProperties) {
+                    HexagonCodeCSS = HexagonCodeCSS.replaceAll(`var(${name})`, value);
+                }
                 layHexagonCodeCSS.textContent = HexagonCodeCSS.replace(/var\(--hexagon-(hover-)?background-image\)/g,
                     (_, hover) => hover ? hoverBackgroundImage : backgroundImage);
             }
             const escapedText = HexagonSpanText.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
             const layHexagonCodeHTML = document.getElementById("layHexagonCodeHTML");
             layHexagonCodeHTML.textContent =
-`<div class="hexagon">
+`<div class="hexagon">${useShadowGradient ? '\n    <div class="hexagon-shadow" aria-hidden="true"></div>' : ""}
     <span>${escapedText}</span>
 </div>`;
 
