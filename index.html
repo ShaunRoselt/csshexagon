@@ -64,6 +64,32 @@
         .form-range.inputContainer:has(> .form-range-input:disabled) > label {
             color: var(--bs-fg-3);
         }
+        .cursor-picker {
+            position: relative;
+        }
+        .cursor-picker > .combobox-toggle {
+            min-height: calc(3.75rem + 2 * var(--bs-border-width));
+        }
+        .cursor-picker-label {
+            display: block;
+            color: var(--bs-fg-3);
+            font-size: .8125rem;
+        }
+        .cursor-picker > .menu {
+            min-width: 100%;
+            --bs-menu-max-height: min(20rem, 50dvh);
+        }
+        .cursor-picker .menu-item:focus-visible {
+            outline: 2px solid var(--bs-fg-2);
+            outline-offset: -2px;
+        }
+        .cursor-picker .menu-item.selected {
+            background-color: var(--bs-bg-2);
+        }
+        .cursor-picker .menu-item.selected::after {
+            content: "✓" / "";
+            margin-inline-start: auto;
+        }
         #layHexagon > .col:first-child {
             padding-block-end: max(var(--hexagon-margin-top), var(--hexagon-hover-margin-top));
         }
@@ -219,44 +245,52 @@
                                 <label for="hexagonSize">Size (px)</label>
                                 <input type="number" class="form-control" id="hexagonSize" placeholder="Size (px)" onkeyup="HexagonSizeChange();" onchange="HexagonSizeChange();" value="300">
                             </div>
-                            <div class="form-floating">
-                                <label for="hexagonCursor">Cursor</label>
-                                <select class="form-control" id="hexagonCursor" onchange="HexagonSizeChange();">
-                                    <option value="alias">alias</option>
-                                    <option value="all-scroll">all-scroll</option>
-                                    <option value="auto">auto</option>
-                                    <option value="cell">cell</option>
-                                    <option value="context-menu">context-menu</option>
-                                    <option value="col-resize">col-resize</option>
-                                    <option value="copy">copy</option>
-                                    <option value="crosshair">crosshair</option>
-                                    <option value="default" selected>default</option>
-                                    <option value="e-resize">e-resize</option>
-                                    <option value="ew-resize">ew-resize</option>
-                                    <option value="grab">grab</option>
-                                    <option value="grabbing">grabbing</option>
-                                    <option value="help">help</option>
-                                    <option value="move">move</option>
-                                    <option value="n-resize">n-resize</option>
-                                    <option value="ne-resize">ne-resize</option>
-                                    <option value="nesw-resize">nesw-resize</option>
-                                    <option value="ns-resize">ns-resize</option>
-                                    <option value="nw-resize">nw-resize</option>
-                                    <option value="nwse-resize">nwse-resize</option>
-                                    <option value="no-drop">no-drop</option>
-                                    <option value="not-allowed">not-allowed</option>
-                                    <option value="pointer">pointer</option>
-                                    <option value="progress">progress</option>
-                                    <option value="row-resize">row-resize</option>
-                                    <option value="s-resize">s-resize</option>
-                                    <option value="se-resize">se-resize</option>
-                                    <option value="sw-resize">sw-resize</option>
-                                    <option value="text">text</option>
-                                    <option value="w-resize">w-resize</option>
-                                    <option value="wait">wait</option>
-                                    <option value="zoom-in">zoom-in</option>
-                                    <option value="zoom-out">zoom-out</option>
-                                </select>
+                            <div class="cursor-picker">
+                                <button type="button" class="form-control combobox-toggle" id="hexagonCursor" data-bs-toggle="combobox"
+                                        aria-labelledby="hexagonCursorLabel hexagonCursorValue" aria-controls="hexagonCursorOptions"
+                                        aria-haspopup="listbox" aria-expanded="false">
+                                    <span>
+                                        <span class="cursor-picker-label" id="hexagonCursorLabel">Cursor</span>
+                                        <span class="combobox-value" id="hexagonCursorValue">default</span>
+                                    </span>
+                                    <i class="bi bi-chevron-down combobox-caret" aria-hidden="true"></i>
+                                </button>
+                                <div class="menu" id="hexagonCursorOptions" role="listbox" aria-labelledby="hexagonCursorLabel">
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="alias">alias</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="all-scroll">all-scroll</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="auto">auto</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="cell">cell</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="context-menu">context-menu</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="col-resize">col-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="copy">copy</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="crosshair">crosshair</button>
+                                    <button type="button" class="menu-item selected" role="option" tabindex="-1" aria-selected="true" data-bs-value="default">default</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="e-resize">e-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="ew-resize">ew-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="grab">grab</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="grabbing">grabbing</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="help">help</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="move">move</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="n-resize">n-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="ne-resize">ne-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="nesw-resize">nesw-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="ns-resize">ns-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="nw-resize">nw-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="nwse-resize">nwse-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="no-drop">no-drop</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="not-allowed">not-allowed</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="pointer">pointer</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="progress">progress</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="row-resize">row-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="s-resize">s-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="se-resize">se-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="sw-resize">sw-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="text">text</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="w-resize">w-resize</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="wait">wait</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="zoom-in">zoom-in</button>
+                                    <button type="button" class="menu-item" role="option" tabindex="-1" aria-selected="false" data-bs-value="zoom-out">zoom-out</button>
+                                </div>
                             </div>
                             <div class="inputContainer">
                                 <div class="form-field">
@@ -474,7 +508,7 @@
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // General
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            const HexagonCursor = document.getElementById("hexagonCursor").value;
+            const HexagonCursor = cursorOptions.querySelector(".selected").dataset.bsValue;
             const HexagonColor = document.getElementById("hexagonColor").value; 
             let HexagonWidth = document.getElementById("hexagonSize").value; 
             if (HexagonWidth == "") HexagonWidth = 0;
@@ -684,6 +718,17 @@
                 window.hljs?.highlightElement(codeBlock);
             }
         }
+        const cursorPicker = document.getElementById("hexagonCursor");
+        const cursorOptions = document.getElementById("hexagonCursorOptions");
+        for (const option of cursorOptions.querySelectorAll("[data-bs-value]")) {
+            option.style.cursor = option.dataset.bsValue;
+        }
+        cursorPicker.addEventListener("shown.bs.combobox", () => {
+            cursorOptions.querySelector(".selected").focus();
+        });
+        cursorPicker.addEventListener("change.bs.combobox", () => {
+            HexagonSizeChange();
+        });
         HexagonSizeChange();
     </script>
     
