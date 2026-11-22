@@ -16,6 +16,9 @@
 
     <style>
         :root {
+            --hexagon-outline: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            --hexagon-border-scale-x: 1;
+            --hexagon-border-scale-y: 1.1547005383792517;
             --hexagon-cursor: default;
             --hexagon-width: 210px;
             --hexagon-height: 121.24px;
@@ -74,26 +77,29 @@
     margin: var(--hexagon-margin-top) auto 0 auto;
     filter: drop-shadow(0 0 calc(var(--hexagon-shadow-blur) / 2) var(--hexagon-shadow-color));
     display: grid;
+    pointer-events: none;
     transition: var(--hexagon-hover-transition);
 }
 
 .hexagon::before, .hexagon::after {
     content: "";
     position: absolute;
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    clip-path: var(--hexagon-outline);
     transition: inset var(--hexagon-hover-transition),
                 background-color var(--hexagon-hover-transition),
                 opacity var(--hexagon-hover-transition);
 }
 
 .hexagon::before {
-    inset: -50% 0;
+    inset: calc(-1 * var(--hexagon-margin-top)) 0;
+    pointer-events: auto;
     background-color: var(--hexagon-border-color);
     opacity: sign(var(--hexagon-border-width));
 }
 
 .hexagon::after {
-    inset: calc(-50% + 2 * var(--hexagon-span-top)) var(--hexagon-border-width);
+    inset: calc(var(--hexagon-border-width) * var(--hexagon-border-scale-y) - var(--hexagon-margin-top))
+           calc(var(--hexagon-border-width) * var(--hexagon-border-scale-x));
     background: var(--hexagon-background-image) center / cover no-repeat var(--hexagon-color);
 }
 
@@ -109,6 +115,7 @@
     width: var(--hexagon-span-width);
     height: var(--hexagon-span-height);
     z-index: 1;
+    pointer-events: auto;
     transition: var(--hexagon-hover-span-transition);
 }
     </style>
@@ -120,15 +127,37 @@
     filter: drop-shadow(0 0 calc(var(--hexagon-hover-shadow-blur) / 2) var(--hexagon-hover-shadow-color));
 }
 
+.hexagon:hover::before, .hexagon:hover::after {
+    clip-path: var(--hexagon-hover-outline);
+}
+
 .hexagon:hover::before {
+    inset: calc(-1 * var(--hexagon-hover-margin-top)) 0;
     background-color: var(--hexagon-hover-border-color);
     opacity: sign(var(--hexagon-hover-border-width));
 }
 
 .hexagon:hover::after {
-    inset: calc(-50% + 2 * var(--hexagon-hover-span-top)) var(--hexagon-hover-border-width);
+    inset: calc(var(--hexagon-hover-border-width) * var(--hexagon-hover-border-scale-y) - var(--hexagon-hover-margin-top))
+           calc(var(--hexagon-hover-border-width) * var(--hexagon-hover-border-scale-x));
     background-color: var(--hexagon-hover-color);
     background-image: var(--hexagon-hover-background-image);
+}
+
+.hexagon span::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: calc(-1 * var(--hexagon-margin-top));
+    left: calc((100% - var(--hexagon-width)) / 2);
+    width: var(--hexagon-width);
+    height: calc(var(--hexagon-height) + 2 * var(--hexagon-margin-top));
+    clip-path: var(--hexagon-outline);
+    transition: top var(--hexagon-hover-transition);
+}
+
+.hexagon:hover span::before {
+    top: calc(-1 * var(--hexagon-hover-margin-top));
 }
 
 .hexagon:hover span {
@@ -231,6 +260,10 @@
                             </div>
                             <div class="inputContainer">
                                 <div class="form-field">
+                                    <input class="check" type="checkbox" id="hexagonFlatTop" onchange="HexagonSizeChange();">
+                                    <label for="hexagonFlatTop">Flat Top</label>
+                                </div>
+                                <div class="form-field">
                                     <input class="check" type="checkbox" id="hexagonVariablesCSS" onchange="HexagonSizeChange();">
                                     <label for="hexagonVariablesCSS">Variables</label>
                                 </div>
@@ -293,6 +326,10 @@
                                 <div class="form-field">
                                     <input class="check" type="checkbox" id="hexagonHover" onchange="HexagonSizeChange();">
                                     <label for="hexagonHover">Hover</label>
+                                </div>
+                                <div class="form-field">
+                                    <input class="check" type="checkbox" id="hexagonHoverFlatTop" onchange="HexagonSizeChange();">
+                                    <label for="hexagonHoverFlatTop">Flat Top</label>
                                 </div>
                             </div>
                             <div class="form-floating">
@@ -392,9 +429,42 @@
                 return ArrayRGB;
             }
             const HexagonHover = document.getElementById("hexagonHover").checked; 
-            document.querySelectorAll("#hover .form-control, #hover .form-range-input").forEach((element) => {
+            document.querySelectorAll("#hover .form-control, #hover .form-range-input, #hexagonHoverFlatTop").forEach((element) => {
                 element.disabled = !HexagonHover;
             });
+            function getOrientation(flatTop) {
+                const angledBorderScale = 2 / Math.sqrt(3);
+                return {
+                    flatTop,
+                    outline: flatTop
+                        ? "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)"
+                        : "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                    borderScaleX: flatTop ? angledBorderScale : 1,
+                    borderScaleY: flatTop ? 1 : angledBorderScale,
+                };
+            }
+
+            function getGeometry(width, border, { flatTop, borderScaleX, borderScaleY }) {
+                const height = flatTop ? width * Math.sqrt(3) / 2 : width / Math.sqrt(3);
+                const innerWidth = width - 2 * border * borderScaleX;
+                const textHeight = flatTop ? (height - 2 * border) / 2 : height - border * borderScaleY;
+                return {
+                    height,
+                    marginTop: flatTop ? 0 : height / 2,
+                    textTop: (height - textHeight) / 2,
+                    textWidth: flatTop ? innerWidth * 0.75 : innerWidth,
+                    textHeight: textHeight.toFixed(4),
+                };
+            }
+
+            const orientation = getOrientation(document.getElementById("hexagonFlatTop").checked);
+            const hoverOrientation = HexagonHover ? getOrientation(document.getElementById("hexagonHoverFlatTop").checked) : orientation;
+            document.documentElement.style.setProperty("--hexagon-outline", orientation.outline);
+            document.documentElement.style.setProperty("--hexagon-border-scale-x", orientation.borderScaleX);
+            document.documentElement.style.setProperty("--hexagon-border-scale-y", orientation.borderScaleY);
+            document.documentElement.style.setProperty("--hexagon-hover-outline", hoverOrientation.outline);
+            document.documentElement.style.setProperty("--hexagon-hover-border-scale-x", hoverOrientation.borderScaleX);
+            document.documentElement.style.setProperty("--hexagon-hover-border-scale-y", hoverOrientation.borderScaleY);
             const backgroundImage = getBackgroundImage("hexagonImageURL");
             const hoverBackgroundImage = HexagonHover ? getBackgroundImage("hexagonHoverImageURL") : backgroundImage;
 
@@ -408,8 +478,6 @@
             const HexagonColor = document.getElementById("hexagonColor").value; 
             let HexagonWidth = document.getElementById("hexagonSize").value; 
             if (HexagonWidth == "") HexagonWidth = 0;
-            const HexagonHeight = HexagonWidth / Math.sqrt(3);
-            const HexagonMarginTop = HexagonHeight/2;
             let HexagonBorderSize = document.getElementById("hexagonBorderSize").value;
             if (HexagonBorderSize == "") HexagonBorderSize = 0;
             const HexagonBorderColor = document.getElementById("hexagonBorderColor").value;
@@ -422,9 +490,13 @@
             let HexagonSpanTextSize = document.getElementById("hexagonTextSize").value;
             if (HexagonSpanTextSize == "") HexagonSpanTextSize = 0;
             const HexagonSpanColor = document.getElementById("hexagonTextColor").value;
-            const HexagonShadowSpanTop = HexagonBorderSize * Math.tan(30 * Math.PI/180);
-            const HexagonShadowSpanWidth = HexagonWidth - (HexagonBorderSize * 2); 
-            const HexagonShadowSpanHeight = (HexagonHeight - (HexagonBorderSize * Math.tan(30 * Math.PI/180) * 2)).toFixed(4);
+            const {
+                height: HexagonHeight,
+                marginTop: HexagonMarginTop,
+                textTop: HexagonShadowSpanTop,
+                textWidth: HexagonShadowSpanWidth,
+                textHeight: HexagonShadowSpanHeight,
+            } = getGeometry(HexagonWidth, HexagonBorderSize, orientation);
             const HexagonVariablesCSS = document.getElementById("hexagonVariablesCSS").checked;
             document.documentElement.style.setProperty("--hexagon-cursor", `${HexagonCursor}`);
             document.documentElement.style.setProperty("--hexagon-width", `${HexagonWidth}px`);
@@ -449,8 +521,6 @@
             const HexagonHoverColor = document.getElementById("hexagonHoverColor").value; 
             let HexagonHoverWidth = document.getElementById("hexagonHoverSize").value; 
             if (HexagonHoverWidth == "") HexagonHoverWidth = 0;
-            const HexagonHoverHeight = HexagonHoverWidth / Math.sqrt(3);
-            const HexagonHoverMarginTop = HexagonHoverHeight/2;
             let HexagonHoverBorderSize = document.getElementById("hexagonHoverBorderSize").value;
             if (HexagonHoverBorderSize == "") HexagonHoverBorderSize = 0;
             const HexagonHoverBorderColor = document.getElementById("hexagonHoverBorderColor").value;
@@ -462,9 +532,13 @@
             let HexagonHoverSpanTextSize = document.getElementById("hexagonHoverTextSize").value;
             if (HexagonHoverSpanTextSize == "") HexagonHoverSpanTextSize = 0;
             const HexagonHoverSpanColor = document.getElementById("hexagonHoverTextColor").value;
-            const HexagonHoverShadowSpanTop = HexagonHoverBorderSize * Math.tan(30 * Math.PI/180);
-            const HexagonHoverShadowSpanWidth = HexagonHoverWidth - (HexagonHoverBorderSize * 2); 
-            const HexagonHoverShadowSpanHeight = (HexagonHoverHeight - (HexagonHoverBorderSize * Math.tan(30 * Math.PI/180) * 2)).toFixed(4);
+            const {
+                height: HexagonHoverHeight,
+                marginTop: HexagonHoverMarginTop,
+                textTop: HexagonHoverShadowSpanTop,
+                textWidth: HexagonHoverShadowSpanWidth,
+                textHeight: HexagonHoverShadowSpanHeight,
+            } = getGeometry(HexagonHoverWidth, HexagonHoverBorderSize, hoverOrientation);
             let HexagonHoverTransition = document.getElementById("hexagonHoverTransition").value;
             if (HexagonHoverTransition == "") HexagonHoverTransition = 0;
             let HexagonHoverSpanTransition = document.getElementById("hexagonHoverTextTransition").value;
@@ -513,6 +587,9 @@
             if (HexagonVariablesCSS){
                 layHexagonCodeCSS.textContent =
 `:root {
+    --hexagon-outline: ${orientation.outline};
+    --hexagon-border-scale-x: ${orientation.borderScaleX};
+    --hexagon-border-scale-y: ${orientation.borderScaleY};
     --hexagon-cursor: ${HexagonCursor};
     --hexagon-width: ${HexagonWidth}px;
     --hexagon-height: ${HexagonHeight}px;
@@ -533,7 +610,10 @@
 `;
                 if (HexagonHover) {
                     layHexagonCodeCSS.textContent +=
-`    --hexagon-hover-background-image: ${hoverBackgroundImage};
+`    --hexagon-hover-outline: ${hoverOrientation.outline};
+    --hexagon-hover-border-scale-x: ${hoverOrientation.borderScaleX};
+    --hexagon-hover-border-scale-y: ${hoverOrientation.borderScaleY};
+    --hexagon-hover-background-image: ${hoverBackgroundImage};
     --hexagon-hover-width: ${HexagonHoverWidth}px;
     --hexagon-hover-height: ${HexagonHoverHeight}px;
     --hexagon-hover-margin-top: ${HexagonHoverMarginTop}px;
@@ -551,7 +631,13 @@
                 }
                 layHexagonCodeCSS.textContent += `}\n\n${hexagonRules}`;
             } else {
-                let HexagonCodeCSS = hexagonRules;
+                let HexagonCodeCSS = hexagonRules
+                    .replaceAll("var(--hexagon-outline)", orientation.outline)
+                    .replaceAll("var(--hexagon-border-scale-x)", orientation.borderScaleX)
+                    .replaceAll("var(--hexagon-border-scale-y)", orientation.borderScaleY)
+                    .replaceAll("var(--hexagon-hover-outline)", hoverOrientation.outline)
+                    .replaceAll("var(--hexagon-hover-border-scale-x)", hoverOrientation.borderScaleX)
+                    .replaceAll("var(--hexagon-hover-border-scale-y)", hoverOrientation.borderScaleY);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-cursor)",`${HexagonCursor}`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-width)",`${HexagonWidth}px`);
                 HexagonCodeCSS = HexagonCodeCSS.replaceAll("var(--hexagon-height)",`${HexagonHeight}px`);
