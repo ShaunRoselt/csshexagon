@@ -71,6 +71,7 @@ function readDesign(hover = false) {
         borderColor: setting("border-color"),
         color: setting("color"),
         imageURL: window.getImageURL(inputPrefix + "ImageURL"),
+        imageFraming: window.getImageFraming(inputPrefix),
         gradient: window.getGradient(inputPrefix),
         borderGradient: window.getGradient(inputPrefix + "Border"),
         textGradient: window.getGradient(inputPrefix + "Text"),
@@ -104,8 +105,8 @@ async function embedBackground(url) {
             reader.onerror = () => reject(reader.error);
             reader.readAsDataURL(blob);
         });
-        await decodeImage(dataURL);
-        return dataURL;
+        const image = await decodeImage(dataURL);
+        return { source: dataURL, aspectRatio: image.naturalWidth / image.naturalHeight };
     } catch {
         throw new Error("The background image could not be embedded. Try HTML or a different image URL.");
     }
@@ -157,6 +158,20 @@ function imageBounds(...designs) {
     return { width: width + 2 * pad, height: height + 2 * pad, pad };
 }
 
+function imageMarkup(image, design) {
+    const { width, height, insetX, insetY, imageFraming } = design;
+    const innerWidth = Math.max(0, width - 2 * insetX);
+    const innerHeight = Math.max(0, height - 2 * insetY);
+    if (!image || !innerWidth || !innerHeight) return "";
+
+    const { x, y, zoom } = imageFraming;
+    const imageWidth = Math.max(innerWidth, innerHeight * image.aspectRatio) * zoom / 100;
+    const imageHeight = imageWidth / image.aspectRatio;
+    return `<image href="${escapeXML(image.source)}" x="${insetX + (innerWidth - imageWidth) * x / 100}"
+        y="${insetY + (innerHeight - imageHeight) * y / 100}" width="${imageWidth}" height="${imageHeight}"
+        preserveAspectRatio="none" clip-path="url(#hexagon-fill)"/>`;
+}
+
 function svgFrame(design, image, bounds, layer = "Composite") {
     const { width, height, outline, insetX, insetY, shadowBlur, shadowColor, shadowOpacity } = design;
     const outer = pointsFor(outline, width, height);
@@ -171,8 +186,7 @@ function svgFrame(design, image, bounds, layer = "Composite") {
             ? `<polygon points="${outer}" fill="${borderPaint}" opacity="${design.borderOpacity}"/>`
             : "",
         Fill: `<polygon points="${inner}" fill="${design.gradient ? "url(#hexagon-gradient)" : design.color}"/>`,
-        Image: image ? `<image href="${escapeXML(image)}" x="${insetX}" y="${insetY}" width="${Math.max(0, width - 2 * insetX)}"
-            height="${Math.max(0, height - 2 * insetY)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#hexagon-fill)"/>` : "",
+        Image: imageMarkup(image, design),
         Text: ["Composite", "Shadow", "Text"].includes(layer) ? textMarkup(design) : "",
     };
     const content = layer === "Shadow" && gradientShadow ? "" : layer === "Border"
