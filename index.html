@@ -61,14 +61,12 @@
             min-inline-size: 0;
             padding: 0;
         }
-        .image-controls .form-control,
-        .transition-easing > .form-control {
+        .image-controls .form-control {
             border-color: transparent;
             background-color: transparent;
             box-shadow: none;
         }
-        .image-controls .form-control:focus-visible,
-        .transition-easing > .form-control:focus-visible {
+        .image-controls .form-control:focus-visible {
             outline: 2px solid var(--bs-fg-2);
             outline-offset: -2px;
         }
@@ -78,26 +76,19 @@
             gap: .5rem;
             min-inline-size: 0;
         }
-        .gradient-controls,
-        .transition-controls {
+        .gradient-controls {
             min-inline-size: 0;
         }
         .gradient-controls .gradient-color,
-        .gradient-controls .form-range,
-        .transition-easing {
+        .gradient-controls .form-range {
             margin-block-start: .5rem;
         }
-        .gradient-color > label,
-        .transition-easing > label:not([hidden]) {
+        .gradient-color > label {
             display: block;
             font-size: .8125rem;
         }
-        .transition-easing > select[hidden] {
+        .transition-easing > [hidden] {
             display: none;
-        }
-        .transition-easing > .form-control {
-            padding-block: .125rem;
-            padding-inline-start: 0;
         }
         .gradient-color > .form-control {
             min-height: 1.5rem;
@@ -111,8 +102,7 @@
             outline-offset: 1px;
         }
         .gradient-controls:has(.gradient-toggle:disabled),
-        .image-controls:has(.form-control:disabled),
-        .transition-controls:has(select:disabled) {
+        .image-controls:has(.form-control:disabled) {
             background-color: var(--bs-bg-2);
             border-color: var(--bs-border-color);
             color: var(--bs-fg-3);
@@ -642,24 +632,21 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Size (px)" value="300">
                                 <input class="form-range-input" type="range" id="hexagonHoverSize" min="0" max="1000" step="1" value="300" oninput="HexagonSizeChange();">
                             </div>
-                            <fieldset class="inputContainer transition-controls">
-                                <legend class="visually-hidden">Shape transition</legend>
-                                <div class="form-range">
-                                    <label for="hexagonHoverTransition">Transition (s)</label>
-                                    <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Transition (s)" value="0">
-                                    <input class="form-range-input" type="range" id="hexagonHoverTransition" min="0" max="5" step="0.1" value="0" oninput="HexagonSizeChange();">
-                                </div>
-                                <div class="transition-easing">
-                                    <label for="hexagonHoverEasing">Transition easing</label>
-                                    <select class="form-control" id="hexagonHoverEasing" onchange="HexagonSizeChange();" disabled>
-                                        <option value="ease" selected>Ease</option>
-                                        <option value="linear">Linear</option>
-                                        <option value="ease-in">Ease In</option>
-                                        <option value="ease-out">Ease Out</option>
-                                        <option value="ease-in-out">Ease In Out</option>
-                                    </select>
-                                </div>
-                            </fieldset>
+                            <div class="form-range inputContainer">
+                                <label for="hexagonHoverTransition">Transition (s)</label>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Transition (s)" value="0">
+                                <input class="form-range-input" type="range" id="hexagonHoverTransition" min="0" max="5" step="0.1" value="0" oninput="HexagonSizeChange();">
+                            </div>
+                            <div class="form-floating transition-easing">
+                                <label for="hexagonHoverEasing">Transition easing</label>
+                                <select class="form-control" id="hexagonHoverEasing" onchange="HexagonSizeChange();" disabled>
+                                    <option value="ease" selected>Ease</option>
+                                    <option value="linear">Linear</option>
+                                    <option value="ease-in">Ease In</option>
+                                    <option value="ease-out">Ease Out</option>
+                                    <option value="ease-in-out">Ease In Out</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="col">
                             <fieldset class="inputContainer gradient-controls">
@@ -800,24 +787,21 @@
                                 <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Text Size (px)" value="25">
                                 <input class="form-range-input" type="range" id="hexagonHoverTextSize" min="0" max="150" step="1" value="25" oninput="HexagonSizeChange();">
                             </div>
-                            <fieldset class="inputContainer transition-controls">
-                                <legend class="visually-hidden">Text transition</legend>
-                                <div class="form-range">
-                                    <label for="hexagonHoverTextTransition">Transition (s)</label>
-                                    <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Text Transition (s)" value="0">
-                                    <input class="form-range-input" type="range" id="hexagonHoverTextTransition" min="0" max="5" step="0.1" value="0" oninput="HexagonSizeChange();">
-                                </div>
-                                <div class="transition-easing">
-                                    <label for="hexagonHoverTextEasing">Text transition easing</label>
-                                    <select class="form-control" id="hexagonHoverTextEasing" onchange="HexagonSizeChange();" disabled>
-                                        <option value="ease" selected>Ease</option>
-                                        <option value="linear">Linear</option>
-                                        <option value="ease-in">Ease In</option>
-                                        <option value="ease-out">Ease Out</option>
-                                        <option value="ease-in-out">Ease In Out</option>
-                                    </select>
-                                </div>
-                            </fieldset>
+                            <div class="form-range inputContainer">
+                                <label for="hexagonHoverTextTransition">Transition (s)</label>
+                                <input class="range-value" type="number" inputmode="decimal" aria-label="Exact Text Transition (s)" value="0">
+                                <input class="form-range-input" type="range" id="hexagonHoverTextTransition" min="0" max="5" step="0.1" value="0" oninput="HexagonSizeChange();">
+                            </div>
+                            <div class="form-floating transition-easing">
+                                <label for="hexagonHoverTextEasing">Text transition easing</label>
+                                <select class="form-control" id="hexagonHoverTextEasing" onchange="HexagonSizeChange();" disabled>
+                                    <option value="ease" selected>Ease</option>
+                                    <option value="linear">Linear</option>
+                                    <option value="ease-in">Ease In</option>
+                                    <option value="ease-out">Ease Out</option>
+                                    <option value="ease-in-out">Ease In Out</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
