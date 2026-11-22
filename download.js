@@ -12,6 +12,7 @@ const types = {
 const status = document.getElementById("downloadStatus");
 const toggle = document.getElementById("downloadToggle");
 const menu = document.getElementById("downloadMenu");
+const { pointsFor, svgGradient } = window;
 let preparing = false;
 let encodeWebP;
 
@@ -42,13 +43,6 @@ function makeTextDownload(format) {
 </html>
 `;
     return new Blob([page], { type: types.html });
-}
-
-function pointsFor(outline, width, height, insetX = 0, insetY = 0) {
-    return outline.slice("polygon(".length, -1).split(",").map(point => {
-        const [x, y] = point.trim().split(/\s+/).map(parseFloat);
-        return `${insetX + x / 100 * (width - 2 * insetX)},${insetY + y / 100 * (height - 2 * insetY)}`;
-    }).join(" ");
 }
 
 function readDesign(hover = false) {
@@ -161,21 +155,6 @@ function imageBounds(...designs) {
         : 0;
     const pad = Math.ceil(blur * 3);
     return { width: width + 2 * pad, height: height + 2 * pad, pad };
-}
-
-function svgGradient(gradient, id, left, top, width, height) {
-    const radians = gradient.angle * Math.PI / 180;
-    const dx = Math.sin(radians);
-    const dy = -Math.cos(radians);
-    const halfLength = (width * Math.abs(dx) + height * Math.abs(dy)) / 2;
-    const x = left + width / 2;
-    const y = top + height / 2;
-    return `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" color-interpolation="sRGB"
-        x1="${x - dx * halfLength}" y1="${y - dy * halfLength}"
-        x2="${x + dx * halfLength}" y2="${y + dy * halfLength}">
-        <stop offset="0" stop-color="${gradient.start}"/>
-        <stop offset="1" stop-color="${gradient.end}"/>
-    </linearGradient>`;
 }
 
 function svgFrame(design, image, bounds, layer = "Composite") {

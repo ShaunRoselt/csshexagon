@@ -244,40 +244,41 @@
 }
     </style>
     <style id="HexagonShadowGradientCodeCSS">
-.hexagon:has(> .hexagon-shadow:not([hidden])) {
+.hexagon {
     filter: none;
     isolation: isolate;
 }
 
-.hexagon-shadow {
+.hexagon::before, .hexagon::after {
+    z-index: -1;
+}
+
+.hexagon > span {
+    z-index: auto;
+}
+
+.hexagon > span::after {
+    content: "";
     position: absolute;
     inset: calc(-1 * var(--hexagon-margin-top)) 0;
-    z-index: -1;
+    z-index: -2;
+    background: var(--hexagon-shadow-image) center / 100% 100% no-repeat;
     filter: blur(calc(var(--hexagon-shadow-blur) / 2));
     opacity: var(--hexagon-shadow-opacity);
     pointer-events: none;
     transition: var(--hexagon-hover-transition);
 }
-
-.hexagon-shadow::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    clip-path: var(--hexagon-outline);
-    background: var(--hexagon-shadow-paint);
-    transition: background-color var(--hexagon-hover-transition);
-}
     </style>
     <style id="HexagonHoverShadowGradientCodeCSS">
-.hexagon:hover > .hexagon-shadow {
-    inset: calc(-1 * var(--hexagon-hover-margin-top)) 0;
-    filter: blur(calc(var(--hexagon-hover-shadow-blur) / 2));
-    opacity: var(--hexagon-hover-shadow-opacity);
+.hexagon:hover {
+    filter: none;
 }
 
-.hexagon:hover > .hexagon-shadow::before {
-    clip-path: var(--hexagon-hover-outline);
-    background: var(--hexagon-hover-shadow-paint);
+.hexagon:hover > span::after {
+    inset: calc(-1 * var(--hexagon-hover-margin-top)) 0;
+    background-image: var(--hexagon-hover-shadow-image);
+    filter: blur(calc(var(--hexagon-hover-shadow-blur) / 2));
+    opacity: var(--hexagon-hover-shadow-opacity);
 }
     </style>
 </head>
@@ -688,7 +689,6 @@
         <section class="row row-cols-1 md:row-cols-2 gy-3 mb-3" id="layHexagon">
             <div class="col">
                 <div class="hexagon">
-                    <div class="hexagon-shadow" id="layHexagonShadow" aria-hidden="true" hidden></div>
                     <span id="layHexagonText"></span>
                 </div>
             </div>
@@ -809,6 +809,36 @@
             return gradient ? `linear-gradient(${gradient.angle}deg in srgb, ${gradient.start}, ${gradient.end})` : "none";
         }
 
+        function pointsFor(outline, width, height, insetX = 0, insetY = 0) {
+            return outline.slice("polygon(".length, -1).split(",").map(point => {
+                const [x, y] = point.trim().split(/\s+/).map(parseFloat);
+                return `${insetX + x / 100 * (width - 2 * insetX)},${insetY + y / 100 * (height - 2 * insetY)}`;
+            }).join(" ");
+        }
+
+        function svgGradient(gradient, id, left, top, width, height) {
+            const radians = gradient.angle * Math.PI / 180;
+            const dx = Math.sin(radians);
+            const dy = -Math.cos(radians);
+            const halfLength = (width * Math.abs(dx) + height * Math.abs(dy)) / 2;
+            const x = left + width / 2;
+            const y = top + height / 2;
+            return `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" color-interpolation="sRGB"
+                x1="${x - dx * halfLength}" y1="${y - dy * halfLength}"
+                x2="${x + dx * halfLength}" y2="${y + dy * halfLength}">
+                <stop offset="0" stop-color="${gradient.start}"/>
+                <stop offset="1" stop-color="${gradient.end}"/>
+            </linearGradient>`;
+        }
+
+        function shadowImage(outline, width, height, gradient, color) {
+            const definition = gradient ? svgGradient(gradient, "shadow", 0, 0, width, height) : "";
+            const fill = gradient ? "url(#shadow)" : color;
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">`
+                + definition + `<polygon points="${pointsFor(outline, width, height)}" fill="${fill}"/></svg>`;
+            return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+        }
+
         function getBackgroundImage(prefix) {
             const url = getImageURL(prefix + "ImageURL");
             const gradient = getGradient(prefix);
@@ -896,19 +926,24 @@
             const generalShadowGradient = getGradient("hexagonShadow");
             const hoverShadowGradient = HexagonHover ? getGradient("hexagonHoverShadow") : generalShadowGradient;
             const useShadowGradient = generalShadowGradient || hoverShadowGradient;
-            document.getElementById("layHexagonShadow").hidden = !useShadowGradient;
+            const shadowStyle = document.getElementById("HexagonShadowGradientCodeCSS");
+            const hoverShadowStyle = document.getElementById("HexagonHoverShadowGradientCodeCSS");
+            shadowStyle.disabled = !useShadowGradient;
+            hoverShadowStyle.disabled = !useShadowGradient;
             const gradientProperties = [];
-            for (const [cssPrefix, inputPrefix, textGradient, shadowGradient] of [
-                ["--hexagon-", "hexagon", generalTextGradient, generalShadowGradient],
-                ["--hexagon-hover-", HexagonHover ? "hexagonHover" : "hexagon", hoverTextGradient, hoverShadowGradient],
+            for (const [cssPrefix, inputPrefix, textGradient, shadowGradient, shadowOrientation] of [
+                ["--hexagon-", "hexagon", generalTextGradient, generalShadowGradient, orientation],
+                ["--hexagon-hover-", HexagonHover ? "hexagonHover" : "hexagon", hoverTextGradient, hoverShadowGradient, hoverOrientation],
             ]) {
                 gradientProperties.push(
                     [cssPrefix + "border-gradient", gradientCSS(getGradient(inputPrefix + "Border"))],
                     [cssPrefix + "text-gradient", gradientCSS(textGradient)],
                 );
                 if (useShadowGradient) {
+                    const { width, height, marginTop } = getGeometry(100, 0, shadowOrientation);
+                    const color = document.getElementById(inputPrefix + "ShadowColor").value;
                     gradientProperties.push(
-                        [cssPrefix + "shadow-paint", shadowGradient ? gradientCSS(shadowGradient) : document.getElementById(inputPrefix + "ShadowColor").value],
+                        [cssPrefix + "shadow-image", shadowImage(shadowOrientation.outline, width, height + 2 * marginTop, shadowGradient, color)],
                         [cssPrefix + "shadow-opacity", document.getElementById(inputPrefix + "ShadowColorAlpha").value],
                     );
                 }
@@ -1021,9 +1056,9 @@
             }
 
             if (useShadowGradient) {
-                hexagonRules += "\n\n" + document.getElementById("HexagonShadowGradientCodeCSS").textContent.trim();
+                hexagonRules += "\n\n" + shadowStyle.textContent.trim();
                 if (HexagonHover) {
-                    hexagonRules += "\n\n" + document.getElementById("HexagonHoverShadowGradientCodeCSS").textContent.trim();
+                    hexagonRules += "\n\n" + hoverShadowStyle.textContent.trim();
                 }
             }
 
@@ -1118,7 +1153,7 @@
             const escapedText = HexagonSpanText.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
             const layHexagonCodeHTML = document.getElementById("layHexagonCodeHTML");
             layHexagonCodeHTML.textContent =
-`<div class="hexagon">${useShadowGradient ? '\n    <div class="hexagon-shadow" aria-hidden="true"></div>' : ""}
+`<div class="hexagon">
     <span>${escapedText}</span>
 </div>`;
 
